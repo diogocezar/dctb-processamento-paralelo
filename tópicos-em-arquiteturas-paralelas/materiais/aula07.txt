@@ -1,0 +1,117 @@
+Aula 07
+-------
+
+* Cláusulas de sincronismo (cont.)
+
+  - void omp_FUNC_lock(omp_lock_t *lck)
+    + Similar a semáforos
+    + FUNC pode ser: init, destroy, set, unset, test
+    + Modo de uso:
+      1) Declarar variáveis de lock
+      2) Inicializar o lock com omp_init_lock
+      3) Atribuir o lock com omp_set_lock ou omp_test_lock
+      4) Liberar lock após trabalho completo com omp_unset_lock
+    
+    --------------------
+    // omp_using_locks.c
+    // compile with: /openmp /c
+    #include <stdio.h>
+    #include <omp.h>
+
+    void work(int);
+    void skip(int);
+
+    int main() {
+       omp_lock_t lck;
+       int id;
+
+       omp_init_lock(&lck);
+       #pragma omp parallel shared(lck) private(id)
+       {
+          id = omp_get_thread_num();
+
+          omp_set_lock(&lck);
+          printf_s("My thread id is %d.\n", id);
+
+          // only one thread at a time can execute this printf
+          omp_unset_lock(&lck);
+
+          while (! omp_test_lock(&lck)) {
+             skip(id);   // we do not yet have the lock,
+                         // so we must do something else 
+          }
+          work(id);     // we now have the lock
+                        // and can do the work 
+          omp_unset_lock(&lck);
+       }
+       omp_destroy_lock(&lck);
+    }
+    --------------------
+    
+    + CUIDADO com DEAD-LOCK!
+    
+  #pragma omp master
+  { bloco estruturado }      
+    - Garante execução pela thread master, em contraposição a single, em que qquer uma pode executar
+    - Não há barreira implícita de sincronismo
+      
+* Controle do ambiente de execução
+  - Número de threads: OMP_NUM_THREADS < omp_set_num_threads() < threads() in Parallel
+    --------------------------
+    (void) omp_set_num_threads(4);
+    #pragma omp parallel if (n > 5) num_threads(n) default(none)\
+                    private(TID) shared(n)
+       {
+         TID = omp_get_thread_num();
+         #pragma omp single
+          {
+            printf("Value of n = %d\n",n);
+            printf("Number of threads in parallel region: %d\n",
+                omp_get_num_threads());
+          }
+         printf("Print statement executed by thread %d\n",TID);
+       } /*-- End of parallel region --*/
+
+    --------------------------
+  
+  - omp_get_num_threads
+  - omp_get_thread_num
+  - omp_get_num_procs
+  - omp_in_parallel
+  
+* Cláusula reduce
+  - reduction(operator:list)
+  - EXEMPLO aula07-reduction.c
+  
+* Paralelismo encadeado
+  --------------------------
+  printf("Nested parallelism is %s\n",
+        omp_get_nested() ? "supported" : "not supported");
+    #pragma omp parallel
+       {
+         printf("Thread %d executes the outer parallel region\n",
+                omp_get_thread_num());
+         #pragma omp parallel num_threads(2)
+         {
+            printf(" Thread %d executes inner parallel region\n",
+                   omp_get_thread_num());
+         } /*-- End of inner parallel region --*/
+       } /*-- End of outer parallel region --*/
+
+  --------------------------
+  + CUIDADO com omp_get_thread_num(): retorna 0--N-1, onde N é o time
+  
+  #pragma omp flush [lista]
+    - Modelo de consistência relaxada: permite valores temporários para cada thread.
+    - Garantia de valor único somente em pontos de sincronismo
+    - Diretiva flush atualiza memória global (lista) com valores da thread
+    - Se T modificou var, valor vai p/ memória global. Senão, var é atualizado com valor da mem. global.
+    - FLUSH implicitos em: barreiras, I/O de regiões críticas e lock
+
+
+
+
+
+
+
+

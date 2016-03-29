@@ -1,0 +1,20 @@
+/* Primeiro passo */
+recebe valorLimite
+
+/* Segundo passo */
+raiz <- sqrt{valorLimite}
+
+/* Terceiro passo */
+para i <- 2 até valorLimite
+    vetor[i] <- i
+fim-para
+
+/* Quarto passo */
+para i <- 2 até raiz
+    se vetor[i] = i
+        imprima "O número " i " é primo."
+        para j <- i+i até valorLimite, de i e i
+            vetor[j] <- 0
+        fim-para
+    fim-se
+fim-para

@@ -1,0 +1,33 @@
+\select@language {brazil}
+\contentsline {chapter}{\numberline {1}Introdu\c c\~ao}{6}
+\contentsline {chapter}{\numberline {2}Referencial Te\'orico}{9}
+\contentsline {section}{\numberline {2.1}L\'ogica Proposicional}{9}
+\contentsline {subsection}{\numberline {2.1.1}Linguagem}{9}
+\contentsline {subsubsection}{\numberline {2.1.1.1}Conectivos}{9}
+\contentsline {subsection}{\numberline {2.1.2}F\'ormulas}{10}
+\contentsline {subsection}{\numberline {2.1.3}Sem\^antica}{10}
+\contentsline {subsection}{\numberline {2.1.4}Axiom\'atica}{10}
+\contentsline {subsection}{\numberline {2.1.5}Forma Normal Conjuntiva}{10}
+\contentsline {subsubsection}{\numberline {2.1.5.1}Transforma\c c\~ao em FNC}{11}
+\contentsline {section}{\numberline {2.2}Resolu\c c\~ao}{11}
+\contentsline {subsection}{\numberline {2.2.1}Refuta\c c\~ao por Resolu\c c\~ao}{12}
+\contentsline {subsection}{\numberline {2.2.2}Estrat\'egias para Resolu\c c\~ao}{13}
+\contentsline {subsubsection}{\numberline {2.2.2.1}Simplifica\c c\~ao}{13}
+\contentsline {subsubsection}{\numberline {2.2.2.2}Remo\c c\~ao de Tautologias}{13}
+\contentsline {subsubsection}{\numberline {2.2.2.3}Remo\c c\~ao de Cl\'ausulas com Literal Puro}{14}
+\contentsline {subsubsection}{\numberline {2.2.2.4}Resolu\c c\~ao Linear}{14}
+\contentsline {subsubsection}{\numberline {2.2.2.5}Estrat\'egia dos Literais Enquadrados}{15}
+\contentsline {chapter}{\numberline {3}Implementa\c c\~oes}{16}
+\contentsline {section}{\numberline {3.1}Estrutura da Solu\c c\~ao}{16}
+\contentsline {subsection}{\numberline {3.1.1}Id\'eia Geral}{18}
+\contentsline {section}{\numberline {3.2}Colabora\c c\~ao entre as Cl\'ausulas}{20}
+\contentsline {section}{\numberline {3.3}Divis\~ao de Trabalho por \emph {Threads}}{21}
+\contentsline {chapter}{\numberline {4}Resultados}{22}
+\contentsline {section}{\numberline {4.1}Descri\c c\~ao dos Testes}{22}
+\contentsline {section}{\numberline {4.2}Resultados para Colabora\c c\~ao entre Cl\'ausulas}{24}
+\contentsline {section}{\numberline {4.3}Resultados para Divis\~ao de Trabalho por \emph {Threads}}{25}
+\contentsline {section}{\numberline {4.4}Discuss\~ao dos Resultados}{26}
+\contentsline {subsubsection}{\numberline {4.4.0.1}Discuss\~ao dos Resultados para Colabora\c c\~ao entre \emph {Threads}}{27}
+\contentsline {subsubsection}{\numberline {4.4.0.2}Discuss\~ao dos Resultados para Divis\~ao de Trabalho por \emph {Threads}}{28}
+\contentsline {chapter}{\numberline {5}Conclus\~oes}{31}
+\contentsline {section}{\numberline {5.1}Trabalhos Futuros}{31}

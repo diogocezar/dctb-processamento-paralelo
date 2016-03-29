@@ -1,0 +1,7 @@
+proc (i,j), 0 <= i,j < m do
+	t := 0;
+	for k := - to m-1 do
+		t:= t + a[i][k] * B[k][j];
+	endfor
+	c[i][j] := t;
+end

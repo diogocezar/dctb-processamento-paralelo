@@ -1,0 +1,7 @@
+while not_empty_clause(c) do
+	proc j, 1 <= j < n, do
+		c := resolve(c[j], search_denied_clauses(c[j]));
+		c := mark_resolved(c[j]);
+	end
+	n := count(c);
+endwhile

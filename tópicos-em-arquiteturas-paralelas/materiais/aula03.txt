@@ -1,0 +1,108 @@
+Aula 03
+-------
+
+* O que é OpenMP
+  - Interface de programação (API) para aplicações de memória compartilhada
+    que facilita a programação paralela
+    
+  - Não é uma linguagem de programação: extensão da linguagem C/C++, FORTRAN
+    + Possui diretivas que indicam como o trabalho será dividido entre threads
+      e a ordem de acesso aos dados compartilhados
+      
+  - Tornou-se um padrão de facto:
+    + ênfase em programação estruturada
+    + simplicidade de uso
+    + permite paralelização incremental de código existente
+    + é apoiado pelos principais fabricantes de SMPs
+    
+* Como programar com OpenMP
+  - As "diretivas" OpenMP dizem ao compilador quais instruções devem ser
+    executadas em paralelo e como distribuí-las ao longo das threads
+  
+  - Como transformar um programa sequencial em um programa paralelo:
+    + 1° passo: Identificar o paralelismo. Pode requerer reorganização do 
+                código.
+    + 2° passo: Implementar no código o paralelismo identificado
+    + Entretanto: ganhos significativos de performance geralmente demandam
+        que o programador "suje as mãos" e desenvolva algoritmos paralelos.
+      
+* Comparação de diferentes APIs
+  - aula03.c
+  
+* A idéia básica de OpenMP
+  - Modelo de execução   
+  - Uma thread é uma entidade de tempo de execução capaz de executar uma
+    sequencia de instruções de maneira independente
+    + compartilham espaço de endereçamento do processo
+    + possuem área privada de memória (registradores e pilha)
+    + Program Counter individual
+    + Podem ser executadas concorrentemente num único processador
+        (troca de contexto -> multithreading)
+
+  - Modelo Fork and Join
+     Ruud, slides 13-15
+     
+  - Quando um bloco "parallel" é encontrado por uma thread, ela cria um
+    novo time de threads (FORK) e torna-se master do time
+  - Ao final da execução do bloco, apenas a thread master continua
+  
+  - OpenMP possibilita:
+    + criação de time de threads para execução paralela
+    + especificação de como dividir o trabalho entre as threads
+    + declaração de variáveis privadas e compartilhadas
+    + sincronização de threads e realização de operações exclusivas
+    
+  - Criação de threads
+    + Ocorre ao encontrar um bloco "parallel"
+      Ruud, slides 14-15
+    + Fim do bloco implica em barreira para todas as threads
+    + Blocos encadeados de "parallel": cada thread vira master.
+    
+   - Divisão de trabalho entre threads
+    + Apenas a criação do bloco paralelo não divide o trabalho, apenas faz com
+      que todas threads executem mesma tarefa.
+    + Divisão de um laço FOR: mais comum
+      - atribui uma ou mais iterações a cada thread
+      - estratégia mais direta: atribui "chunks" consecutivos a cada thread
+      *** diferenciar thread, chunk ***
+    + Para laço ser paralelizável:
+      1) número de iterações deve ser conhecido antes e não pode mudar
+      2) iterações devem ser independentes
+      3) dependência de dados impede paralelismo quando o valor que é escrito
+         em uma iteração é lido ou sobrescrito em outra
+         
+    + Divisão por pedaços de código
+    + Pode-se especificar que numa região paralela apenas uma thread execute 
+      um trecho de código.
+   
+  - Modelo de memória
+     Ruud, slide 11-12
+     
+    + Dados privados ou compartilhados para uma determinada região
+      ** dados privados são mais rápidos, evitam lock e ajudam em cc-NUMA **
+    + Tamanho da pilha pode ser insuficiente...
+    + Dados compartilhados são coerentes em determinados pontos de 
+      sincronização, ou seja, temporariamente podem ser != (cache)
+    Ruud, slide 18
+    
+  - Sincronização de Threads
+    + Final de região paralela: sincronização implícita
+    + Apenas uma thread executa determinado código
+      - enquanto esperam, threads podem executar outros trechos
+    + Atualização atômica de variáveis em mem. compartilhada
+    + Sincronização de subconjunto de threads: não suportada, manual
+    + operação flush sincroniza dado compartilhado
+    + Evitar dead-lock e acesso simultâneo a dados compartilhados (data race)
+      é função do programador!
+        - Data race é difícil de detectar, pois pode não ser reprodutível:
+          depende da ordem de execução das threads.
+    + Verificar se número de threads é o esperado, pois limitação nos recursos
+      pode diminuir o número e quebrar o código.
+
+  - Outras características
+    + Controle do número de threads: via var. de ambiente, durante execução
+      ou antes de entrar na região paralela.
+      - permite variação dinâmica do núm. de threads
+      - uma vez iniciada uma região paralela, num de threads não muda.
+   
+

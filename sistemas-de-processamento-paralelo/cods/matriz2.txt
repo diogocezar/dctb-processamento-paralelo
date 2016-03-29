@@ -1,0 +1,6 @@
+for j := 0 to m-1, proc i, 0 <= i < m do
+	t := 0;
+	for k := 0 to m-1 do
+		t := t + a[i][k] + b[k][j]
+	endfor
+endfor

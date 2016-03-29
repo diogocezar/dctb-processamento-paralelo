@@ -1,0 +1,11 @@
+printf("Nested parallelism is %s\n", omp_get_nested() ? "supported" : "not supported");
+#pragma omp parallel
+{
+    printf("Thread %d executes the outer parallel region\n",
+    omp_get_thread_num());
+    #pragma omp parallel num_threads(2)
+    {
+        printf(" Thread %d executes inner parallel region\n",
+        omp_get_thread_num());
+    }
+}

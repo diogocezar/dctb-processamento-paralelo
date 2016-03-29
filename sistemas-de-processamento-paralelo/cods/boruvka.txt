@@ -1,0 +1,9 @@
+se existe algum arco externo a F
+	então  para cada componente T de F
+			escolha um arco mínimo na franja de T
+		seja B o conjunto de todos os arcos escolhidos
+         	seja B' um subconjunto maximal de B tal que
+         		para F+B' não tem ciclos de comprimento >=3
+         	seja B'' o conjunto dos arcos anti-paralelos aos de B'
+         	comece nova iteração com  F+B'+B''  no papel de F
+         senão  pare 

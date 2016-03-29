@@ -1,0 +1,9 @@
+#pragma omp parallel    default(none) \
+                        private(i,TID,indx) \
+                        shared(n,offset,a)
+{
+    TID = omp_get_thread_num();
+    indx = offset + n*TID;
+    for(i=indx; i<indx+n; i++)
+    a[i] = TID + 1;
+} /*-- End of parallel region --*/

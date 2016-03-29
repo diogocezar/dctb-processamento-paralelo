@@ -1,0 +1,897 @@
+%
+%  $Description: Author guidelines and sample document in LaTeX 2.09$
+%
+%  $Author: ienne $
+%  $Date: 1995/09/15 15:20:59 $
+%  $Revision: 1.4 $
+%
+\documentclass[10pt,twocolumn]{article}
+\usepackage{wscad2010}
+\usepackage{times}
+\usepackage{graphicx,url}
+\usepackage[brazil]{babel}
+\usepackage[latin1]{inputenc}
+\usepackage{multirow}
+\usepackage{sty/fitch}
+\usepackage{listings}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{latexsym}
+\usepackage{url}
+
+%\documentstyle[times,art10,twocolumn,latex8]{article}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% E S P A Ç A M E N T O   D U P L O %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\renewcommand{\baselinestretch}{1.0}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% C O M A N D O S   D E   S U B S T I T U I Ç Ã O %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\e}{\land}
+\newcommand{\ou}{\lor}
+\newcommand{\n}{\lnot}
+\newcommand{\im}{\rightarrow}
+\newcommand{\bi}{\leftrightarrow}
+\newcommand{\cl}{\vdash}
+\newcommand{\el}{\equiv}
+\newcommand{\pred}[1]{\mathtt{#1}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% C O N F I G U R A Ç Õ E S  D O S   C Ó D I G O S %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\lstset{numbers=left, stepnumber=1, firstnumber=1,
+numberstyle=\tiny, extendedchars=true, breaklines=true,frame=tb,
+basicstyle=\footnotesize, stringstyle=\footnotesize, showstringspaces=false}
+
+\renewcommand{\lstlistingname}{Código}
+\renewcommand{\lstlistlistingname}{Lista de Códigos}
+
+%-------------------------------------------------------------------------
+% take the % away on next line to produce the final camera-ready version
+\pagestyle{empty}
+
+%-------------------------------------------------------------------------
+\begin{document}
+
+\title{Prova por Resolução Utilizando Estratégia de Proposições Enquadradas em Paralelo Utilizando OpenMp}
+
+\author {   Diogo Cezar Teixeira Batista \\
+            Universidade Federal do Paraná (UFPR) \\
+            Departamento de Informática \\
+            Caixa Postal 19.081 - CEP 81.531-980 - Curitiba - PR - Brasil \\
+            diogoc@c3sl.ufpr.br
+        }
+
+
+\maketitle
+\thispagestyle{empty}
+
+    \begin{abstract}
+        Within computational issues, logic requires automatic mechanisms that can prove theorems mapped to real world situations. This work has used the method of proof by refutational resolution combined with some techniques that reduce the search space in a structure that is representing a theorem. These problems are characterized by a combinatorial explosion, which motivated the use of parallel processing techniques, with the OpenMP API a technique was implemented to distribute the work of searching structure aiming to prove a theorem.
+    \end{abstract}
+
+
+    \Section{Introdução}
+
+    A lógica, em um contexto geral, pretende representar um raciocínio válido. Essa validade depende de uma interpretação que é inserida em um determinado contexto. Por meio de axiomas (símbolos) e regras de inferência, consegue-se mapear algumas situações do mundo real para um contexto lógico, podendo assim, delegar explorações para um sistema automático \cite{Enderton}.
+
+    Para representar situações do mundo real, gera-se prováveis teoremas compostos por premissas (informações que se sabe sobre o fato) e por conclusões (informações que se deseja inferir).
+
+    Por exemplo, pode-se descrever a seguinte situação:
+
+    \begin{enumerate}
+        \item Sócrates estaria disposto a visitar Platão, se Platão estivesse disposto a visitá-lo ($P \im S$);
+        \item Platão não estaria disposto a visitar Sócrates, se Sócrates estivesse disposto a visitá-lo ($S \im \n P$);
+        \item Platão estaria disposto a visitar Sócrates, se Sócrates não estivesse disposto a visitá-lo ($\n S \im P$);
+    \end{enumerate}
+
+    \begin{enumerate}
+        \item pergunta-se: Sócrates está disposto a visitar Platão ou não?
+    \end{enumerate}
+
+    Então o teorema que representa tal situação é dado pela representação lógica no formato clausal da conclusão 1:
+
+    \begin{equation}
+        \footnotesize{
+        \label{socrates_platao}
+        (P \im S), (S \im \n P), (\n S \im P) \cl S
+        }
+    \end{equation}
+
+    Uma das vertentes da lógica, é a tentativa de se provar se um determinado teorema é ou não válido. Essa prova pode ser obtida de diferentes formas, uma delas é a busca axiomática, que visa encontrar a prova para determinado teorema por meio da manipulação de símbolos por regras de inferência; outra forma é a busca semântica, que a partir de transformações na fórmula original, mantém a equivalência preservando as propriedades do teorema original, reduzindo a fórmula e aplicando a prova em um teorema mais simples \cite{Enderton}.
+
+    Pelas regras de adequação e completude \cite{Enderton}, se um teorema for provado pelas regras da semântica diz-se que esse também pode ser provado pelas regras axiomáticas, assim garante-se que um teorema é valido. Nesse contexto o trabalho desenvolvido visa estabelecer a prova pelas regras semânticas.
+
+    As Equação \ref{socrates_platao} representa a fórmula no contexto da lógica proposicional, que consegue representar simples ações do mundo real. Representações mais complexas estão contidas na lógica de primeira ou segunda ordem, que estão fora do escopo desse trabalho.
+
+    Existem algumas técnicas para se provar se um teorema é ou não válido, dentre elas estão: sistema dedutivo de Hilbert, resolução, tableau e sequentes \cite{Enderton}.    Para o presente trabalho, propõe-se a utilização do método de prova por resolução, utilizando as técnicas de resolução linear e proposições enquadradas, que serão detalhadas na Seção \ref{referencial}.
+
+    A grande dificuldade de realizar a prova por resolução de grandes teoremas (com centenas ou milhares de cláusulas) está na explosão combinatória gerada pelo problema. Provar teoremas pode levar uma quantidade de tempo inviável, ou até depender de recursos de hardware indisponíveis, o que acaba dificultando a geração de uma resposta em um tempo satisfatório.
+
+    Por mais rápidos que os processadores possam ser, estamos atingindo o limite físico da velocidade com que os processadores podem trabalhar. Problemas complexos, como a prova por resolução, demandam uma grande quantidade de processamento e dependem de uma solução eficiente. A programação paralela entra nesse contexto, com a idéia de manter vários processadores trabalhando paralelamente com partes menores de um problema maior \cite{1266729}.
+
+%    Dentre as maneiras de paralelismo estão:
+%
+%    \begin{itemize}
+%        \item computadores inter-conectados por uma rede;
+%        \item processadores de múltiplos núcleos;
+%        \item computadores com $p$ processadores;
+%        \item placa gráfica \emph{Graphics Processing Unit} (GPU), aproveitando micro-processadores.
+%    \end{itemize}
+
+    O presente trabalho busca explorar uma solução paralela utilizando a divisão de trabalho por \emph{threads} (componentes que agrupam um determinado trabalho a ser executado) executadas paralelamente em múltiplos micro-processadores. Para isso, foi utilizada uma \emph{Application Programming Interface} (API) chamada OpenMP, que se enquadra para aplicações de memória compartilhada e oferece recursos para facilitar a implementação de técnicas para a programação paralela. A interface não é uma linguagem de programação, mas sim, uma extensão da linguagem C/C++ ou FORTRAN. OpenMP possui diretivas que indicam como o trabalho será dividido entre \emph{threads} e a ordem de acesso aos dados compartilhados \cite{1211440}, \cite{1370966}.
+
+%    A Seção \ref{referencial} detalha os conceitos teóricos da lógica proposicional, da prova por resolução e de algumas estratégias para resolução. A Seção \ref{implementacoes} descreve as implementações propostas para a resolução linear com literais enquadrados em paralelo utilizando OpenMP. Na Seção \ref{resultados} estão os testes realizados, mostra-se os resultados para os experimentos de Colaboração entre Cláusulas e Divisão de Trabalho por Threads e ainda aborda uma discussão sobre esses resultados. Por fim a Seção \ref{conclusao} mostra as conclusões do trabalho e os trabalhos futuros.
+
+    \Section{Referêncial Teórico}
+    \label{referencial}
+
+%    Esse capítulo discute os conceitos teóricos da lógica proposicional, da prova por resolução e de algumas estratégias para resolução.
+
+%    \SubSection{Lógica Proposicional}
+%
+%    A lógica proposicional é um sistema no qual suas fórmulas representam proposições (valores verdadeiros ou falsos) interligadas por conectivos lógicos. Esse sistema é formado por \cite{ginsberg:1993}:
+%
+%    \begin{itemize}
+%        \item linguagem: se refere ao modo como se escreve uma sentença;
+%        \item semântica: se refere ao estudo do significado;
+%        \item axiomática: se refere ao conjunto de premissas iniciais e das proposições que são derivadas desse conjunto.
+%    \end{itemize}
+%
+%    \SubSubSection{Linguagem}
+%
+%    A linguagem proposicional é formada por símbolos que irão representar nossas sentenças, normalmente representadas por letras minúsculas do alfabeto, possívelmente indexadas \cite{ginsberg:1993}:
+%
+%    São exemplos: $p, q, r, p_1, q_1, r_1 \ldots$
+%
+%    \SubSubSection{Conectivos}
+%
+%    São os elementos que executam as operações com os símbolos proposicionais \cite{Enderton}.
+%
+%    \begin{itemize}
+%        \item $\wedge$ - corresponde ao conectivo \emph{e} (conjunção);
+%        \item $\vee$ - corresponde ao conectivo \emph{ou} (disjunção);
+%        \item $\neg$ - corresponde ao conectivo \emph{não} (negação);
+%        \item $\rightarrow$ - corresponde ao conectivo de atribuição ou \emph{implica em} (implicação);
+%        \item $\leftrightarrow$ - corresponde ao conectivo \emph{se e somente se} ou \emph{bi-implicação} (dupla implicação);
+%    \end{itemize}
+%
+%    \SubSubSection{Fórmulas}
+%
+%    Uma fórmula proposicional é formada por uma ou mais proposições, que podem estar ligadas por conectivos \cite{Enderton}.
+%
+%    Por exemplo: $p \ou q$.
+%
+%    \SubSubSection{Semântica}
+%
+%    O contexto semântico refere-se ao significado. Podemos atribuir uma interpretação para uma fórmula proposicional, que valora as proposições com verdadeiro ou falso \cite{Enderton}.
+%
+%    As soluções possíveis para $\{p,q\}$ são:
+%
+%    \begin{center}
+%        $I(p) = 0, I(q) = 0$ \\
+%        $I(p) = 1, I(q) = 1$ \\
+%        $I(p) = 1, I(q) = 0$ \\
+%        $I(p) = 0, I(q) = 1$ \\
+%    \end{center}
+%
+%    \SubSubSection{Axiomática}
+%
+%    Propõe a manipulação da fórmulas por meio de regras axiomáticas e de inferência, a axiomática de Hilbert é um exemplo de manipulação axiomática \cite{Enderton}.
+
+    Uma fórmula proposicional é formada por uma ou mais proposições, que podem estar ligadas por conectivos ($\wedge, \vee, \neg, \rightarrow  e \leftrightarrow$) \cite{Enderton}. Cada fórmula, quando envolvida em uma interpretação, distribui valores do tipo verdadeiro ou falso para cada uma de suas proposições. Uma proposição com valor verdadeiro é representada por um símbolo, por exemplo, $p$ e sua negação por $\n p$. Os conectivos regulam como a interpretação será gerada, e cada fórmula gera sempre um resultado final verdadeiro ou falso para a interpretação atribuída.
+
+    \SubSection{Forma Normal Conjuntiva}
+
+    Segundo \cite{Enderton}, uma fórmula proposicional está em Forma Normal Conjuntiva (FNC) se está na seguinte forma:
+
+    \begin{equation}
+        \footnotesize{
+        \alpha_1 \e \alpha_2 \e ... \e \alpha_n
+        }
+    \end{equation}
+
+    onde, cada $\alpha_i$ é uma cláusula na seguinte forma:
+
+    \begin{equation}
+        \footnotesize{
+        \beta_1 \ou \beta_2 \ou ... \ou \beta_m
+        }
+    \end{equation}
+
+    onde, cada $\beta_i$ é um literal (uma proposição ou sua negação).
+
+    Por exemplo: $p \e q \ou r \e s$.
+
+    \SubSection{Transformação em FNC}
+
+    Para toda fórmula proposicional existe uma FNC equivalente \cite{Enderton}, \cite{ginsberg:1993}, que pode ser obtida por meio de regras de equivalência: eliminação das implicações, distribuição da negação e distribuição da disjunção. O trabalho parte da premissa que as fórmulas de entrada já se encontram em FNC.
+
+%    \begin{enumerate}
+%    \item Eliminação das implicações\\
+%      $\alpha \im \beta \equiv \n \alpha \ou \beta$\\
+%      $\alpha \bi \beta \equiv (\n \alpha \ou \beta) \e (\alpha \ou \n \beta)$\\
+%      $\n(\alpha \bi \beta) \equiv (\alpha \ou \beta) \e (\n \alpha \ou \n \beta)$
+%    \item Distribuição da negação:\\
+%      $\n \n \alpha \equiv \alpha$\\
+%      $\n (\alpha \e \beta) \equiv \n \alpha \ou \n \beta$\\
+%      $\n (\alpha \ou \beta) \equiv \n \alpha \e \n \beta$
+%
+%    \item Distribuição da disjunção:\\
+%      $\alpha \ou (\beta \e \gamma) \equiv (\alpha \ou \beta) \e (\alpha \ou \gamma)$
+%    \end{enumerate}
+
+    \SubSection{Resolução}
+
+    Esse método parte de uma única regra de inferência \cite{ginsberg:1993}:
+
+    \begin{equation}
+        \footnotesize{
+            \frac{\alpha \ou \Phi  \quad \quad \n \alpha \ou \Psi}%
+            {\Phi \ou  \Psi}\;R(\alpha)
+        }
+    \end{equation}
+
+    Se $\alpha \ou \Phi$ é verdadeiro, e $\n \alpha \ou \Psi$ também é verdadeiro, então ou $\Phi$ é verdadeiro ou $\Psi$ ou ambos, então podemos concluir $\Phi \ou  \Psi$. $R(\alpha)$ mostra qual o literal foi resolvido.
+
+    Sejam $p \ou q \e \n p \ou r$, $p \ou q \e \n p \ou q$ e $p \ou q \e \n p \ou q$ fórmulas em FNC, poderíamos resolve-la da seguinte forma:
+
+    \begin{equation}
+        \footnotesize{
+        \begin{nd}
+            \hypo{h1}  {p \ou q}
+            \hypo{h2}  {\n p \ou r}
+            \have{}  {q \ou r}
+        \end{nd}
+        \hspace{0.2cm}
+        \begin{nd}
+            \hypo{h1}  {p \ou q}
+            \hypo{h2}  {\n p \ou q}
+            \have{c1}  {q}
+        \end{nd}
+        \hspace{0.2cm}
+        \begin{nd}
+            \hypo{h1}  {p \ou q}
+            \hypo{h2}  {\n p \ou q}
+            \have{c1}  {q}
+        \end{nd}
+        }
+    \end{equation}
+
+    Ao se obter $q \ou q$ pela resolução de $p \ou q$ e $\n p \ou q$ podemos simplificar somente para $q$. Mais detalhes estão explicados na Seção \ref{simplificacao}.
+
+    Seja $p \ou \n p$ uma fórmula em FNC, poderíamos resolve-las da seguinte forma:
+
+    \begin{equation}
+        \footnotesize{
+        \begin{nd}
+            \hypo{h1}  {p}
+            \hypo{h2}  {\n p}
+            \have{c1}  {\emptyset \textrm{~~ou~~} \bot} \by{R($\alpha = p$)}{h1,h2}
+        \end{nd}
+        }
+    \end{equation}
+
+    Quando não há mais proposições para serem resolvidas, diz-se que se encontrou uma cláusula vazia, que representa uma contradição (\emph{false}) e é também o objetivo do método.
+
+    \SubSubSection{Refutação por Resolução}
+
+%     O princípio da resolução é uma regra de inferência que dá origem a uma técnica de demonstração por refutação para sentenças e inferências da lógica proposicional e da lógica de primeira ordem \cite{Enderton}.
+
+     Seja um conjunto de cláusulas $\mathbb{C}$, provar $\alpha$ parte-se do princípio:
+
+     \begin{itemize}
+        \item Aplica-se a regra de resolução sobre o conjunto $\mathbb{C} \cup \n \alpha$ buscando encontrar uma contradição;
+        \item Se uma contradição for gerada, pode-se dizer que $\n \alpha$ não é verdade, logo $\alpha$ é verdade, e prova o teorema;
+        \item Se nenhuma contradição for gerada, então o teorema testado não é um teorema da base de dados original.
+     \end{itemize}
+
+     Para exemplificar a regra de Refutação por Resolução, vamos utilizar a seguinte fórmula:
+
+     \begin{equation}
+        \footnotesize{
+        p \ou q \e p \im r \e q \im r \cl r
+        }
+     \end{equation}
+
+     Nessa fórmula temos 3 premissas ($\{p \ou q\}$,$\{p \im r\}$,$\{q \im r\}$) e uma conclusão a ser provada ($\cl r$).
+
+     O primeiro passo é chegar na forma normal conjuntiva (FNC) da fórmula, aplicando as regras de equivalências nas cláusulas necessárias:
+
+     \footnotesize{
+     \begin{eqnarray}
+        p \im r \equiv \n p \ou r \\
+        q \im r \equiv \n q \ou r
+     \end{eqnarray}
+     }
+     \normalsize
+
+     Adiciona-se como uma quarta premissa a negação da conclusão a ser provada e inicia-se o método de resolução:
+
+
+    \begin{equation}
+        \footnotesize{
+        \begin{nd}
+        \hypo{h1}  {p \ou q}     \by{primeira premissa}{}
+        \hypo{h2}  {\n p \ou r}  \by{segunda premissa}{}
+        \hypo{h3}  {\n q \ou r}  \by{terceira premissa}{}
+        \open
+        \hypo{h4}  {\n r}  \by{negação da conclusão}{}
+        \have{c1}  {\n p}  \by{R($\alpha = r$)}{h4,h2}
+        \have{c2}  {q}     \by{R($\alpha = \n p$)}{c1,h1}
+        \have{c3}  {r}     \by{R($\alpha = q$)}{c2,h3}
+        \have{c4}  {\bot}  \by{R($\alpha = r$)}{c3,h4}
+        \close
+        \have{c8}  {r}     \by{refutação}{}
+        \end{nd}
+        }
+    \end{equation}
+
+    Dessa maneira consegue-se provar $r$.
+
+    \SubSubSection{Estratégias para Resolução}
+    \label{estrategias}
+
+    Ao se aplicar uma estratégia não restringida do método de resolução, a cada passo, encontra-se várias possibilidades de resolução. Resolvendo todos os passos possíveis garante-se que se houver uma cláusula vazia ela será encontrada, entretanto a explosão combinatória torna a implementação inviável. Algumas técnicas de resolução propõem recursos para diminuir o espaço de busca e aumentar a eficiência de um algoritmo de resolução \cite{resolu}, \cite{resolu2}.
+
+    \SubSubSection{Simplificação}
+    \label{simplificacao}
+
+    Durante a resolução das cláusulas, no instante da junção para formar uma cláusula resultante, é comum encontrar a ocorrência de literais repetidos, como por exemplo: $\{ p, \n q, \n w \}, \{ p, \n q, w \}$.
+
+    Nesse caso pode-se conservar apenas uma ocorrência da proposição que poderia se repetir.
+
+%    \begin{equation}
+%        \begin{nd}
+%            \hypo{h1}  {p \ou \n q \ou \n w}
+%            \hypo{h2}  {p \ou \n q \ou w}
+%            \have{c1}  {p \ou \n q} \by{R($\alpha = w$)}{h1,h2}
+%        \end{nd}
+%        \hspace{0.5cm}
+%        \begin{nd}
+%            \hypo{h1}  {p \ou \n q \ou \n w}
+%            \hypo{h2}  {p \ou \n q \ou w}
+%            \have{c1}  {p \ou \n q \ou p \ou \n q} \by{errado}{}
+%        \end{nd}
+%    \end{equation}
+
+    \SubSubSection{Remoção de Tautologias}
+    \label{tautologia}
+
+    Uma tautologia é a ocorrência de um literal e sua negação na mesma cláusula, esse tipo de informação de nada adianta na resolução.
+
+    Sendo uma cláusula $\{p, \n p, q\}$, supondo que $q$ já foi resolvido, então para encontrar a cláusula vazia é necessário que haja no conjunto de cláusulas $\n p$ e $p$, se elas já estão no conjunto de cláusulas então não é necessário utilizar essa cláusula para efetuar nenhum cálculo, logo essa cláusula pode ser removida.
+
+    \SubSubSection{Remoção de Cláusulas com Literal Puro}
+
+    Um literal é dito puro, se não existe no conjunto de cláusulas nenhuma ocorrência de seu complementar. Se não há seu complementar, essa cláusula nunca ficará vazia e não ajudará na busca.
+
+    \SubSubSection{Resolução Linear}
+
+    A estratégia de resolução linear propõe uma ordem para a resolução das cláusulas. Partindo de uma cláusula centro $c_0$ se obtém na lista de cláusulas, 0, 1 ou mais  resolventes, que são origem a uma nova lista $r_0$. Um membro gerado dessa lista, se torna a nova cláusula centro, e repete-se o procedimento até que a cláusula vazia seja encontrada.
+
+    Por exemplo, seja um conjunto de cláusulas:
+
+    \begin{equation}
+        \label{tautologia_eq}
+        \footnotesize{
+        \begin{nd}
+        \hypo{h1}  {s \ou r}
+        \hypo{h2}  {\n s \ou w}
+        \hypo{h3}  {\n r \ou \n w}
+        \hypo{h4}  {\n p \ou t}
+        \hypo{h5}  {\n t \ou q}
+        \hypo{h6}  {p}
+        \hypo{h7}  {\n q}
+        \open
+        \hypo{h8}  {r \ou w}    \by{R($\alpha = s$)}{h1,h2}
+        \hypo{h9}  {w \ou \n w} \by{R($\alpha = w$)}{h8,h3}
+        \have{c1}  {\emph{tautologia}}
+        \end{nd}
+        }
+    \end{equation}
+
+    No conjunto de cláusulas \ref{tautologia_eq} a cláusula 9 é resolvida utilizando a cláusula 8, uma possível cláusula 10 seria resolvida utilizando a cláusula 9. No a resolução não não foi continuada por encontrar uma tautologia, e como visto na Seção \ref{tautologia}, quando uma tautologia é encontrada, continuar a prova dessa cláusula não chegará na cláusula vazia, então esse método só se torna completo se alguma técnica de \emph{backtrack} for utilizada.
+
+
+%    Por exemplo, seja um conjunto de cláusulas: $\mathbb{C} = \{q \ou p, \n p \ou r, \n r \ou \n p, \n q\}$
+%
+%    \begin{equation}
+%        \label{eq:linear}
+%        \footnotesize{
+%        \begin{nd}
+%            \hypo{h1}  {q \ou p}
+%            \hypo{h2}  {\n p \ou r}
+%            \hypo{h3}  {\n r \ou \n p}
+%            \hypo{h4}  {\n q}
+%            \open
+%            \hypo{h5}  {p}      \by{R($\alpha = q$)}{h1,h4}
+%            \hypo{h6}  {r}      \by{R($\alpha = p$)}{h5,h2}
+%            \hypo{h7}  {\n p}   \by{R($\alpha = r$)}{h6,h3}
+%            \have{c1}  {\bot}   \by{R($\alpha = \n p$)}{h7,h5}
+%        \end{nd}
+%        }
+%    \end{equation}
+
+    Nesse caso é necessário recuar e verificar se existem outras possibilidades. No exemplo, ao se iniciar com as cláusulas $(1,2)$ chegou-se a uma situação sem saída, igualmente se a resolução iniciar com as cláusulas $(1,3)$ ou $(2,3)$. Ao resolver a cláusula $4$ conseguimos uma situação que leva a cláusula vazia.
+
+%    Se uma tautologia for eleita como a cláusula a ser resolvida, o \emph{backtrack} deve ser acionado, pois não é possível chegar a uma cláusula vazia partindo de uma tautologia.
+
+    \SubSubSection{Estratégia dos Literais Enquadrados}
+
+    A estratégia de resolução linear com literais enquadrados (ou \emph{framed}) propõe que os literais resolvidos não sejam removidos das cláusulas resultantes, mas marcados como enquadrados. A estratégia define duas regras que permitem encontrar a cláusula vazia, são elas:
+
+    \begin{itemize}
+        \item resolução: se o último literal da cláusula for complementar de um literal $p$, ou seja ($\n p$) enquadrado, então pode-se remover esse literal da lista;
+        \item eliminação: quando se obtém uma cláusula com literal enquadrado não seguido de nenhum literal "não enquadrado"{} esse também pode ser removido da lista de literais.
+    \end{itemize}
+
+    Seja um conjunto de cláusulas $\mathbb{C} = \{q \ou p, \n p \ou r, \n r \ou \n p, \n q\}$, resolve-se aplicando a técnica de resolução linear com literal enquadrado:
+
+    \begin{equation}
+        \footnotesize{
+        \begin{nd}
+            \hypo{h1}  {q \ou p}
+            \hypo{h2}  {\n p \ou r}
+            \hypo{h3}  {\n r \ou \n p}
+            \hypo{h4}  {\n q}
+            \open
+            \hypo{h5}  {q \ou [p] \ou r}                \by{R($\alpha = p$)}{h1,h4}
+            \hypo{h6}  {q \ou [p] \ou [r] \ou \neg p}   \by{R($\alpha = r$)}{h5,h2}
+            \hypo{h8}  {q \ou [p] \ou [r]}              \by{\emph{resolução}}{}
+            \hypo{h9}  {q}                              \by{\emph{eliminação}}{}
+            \have{c1}  {\bot}                           \by{R($\alpha = q$)}{h9,h4}
+        \end{nd}
+        }
+    \end{equation}
+
+    \SubSection{Modelo PRAM}
+
+    O modelo PRAM (\emph{Parallel Random Access Machine}) representa uma extensão do modelo sequencial RAM (\emph{Random Access Memory}) e é o mais conhecido modelo de computação paralela, representado por um conjunto de processadores que operam de modo síncrono sob controle de um relógio comum \cite{DBLP:books/aw/JaJa92}, \cite{520759}, \cite{1608962}. Cada processador é representado por um índice e possui uma memória local própria, podendo comunicar-se com os outros processadores através de uma memória global compartilhada. Com a abordagem PRAM é possível a criação de pseudo-códigos para representar um modelo que descreva o comportamento de um algoritmo a ser executado em paralelo.
+
+    \Section{Implementações}
+
+%    Nesse capítulo são mostradas as implementações propostas para a resolução linear com literais enquadrados em paralelo utilizando OpenMP. Uma visão geral da estrutura da solução está na Seção \ref{estrutura_solucao}, a primeira abordagem parcial contendo um método de colaboração entre cláusulas está na Seção \ref{colab} e uma segunda abordagem contendo uma solução completa com a divisão do trabalho por \emph{threads} está na Seção \ref{thread}.
+
+%    \SubSection{Estrutura da Solução}
+%    \label{estrutura_solucao}
+
+    A estratégia adotada para a implementação foi a utilização de estruturas de listas encadeadas para representar as cláusulas. Cada cláusula possui informações que formam uma sêxtupla $C<I,L,F,T,P,N>$:
+
+    \begin{itemize}
+        \item[$I$] é a identificação da cláusula, na estrutura representada por um tipo de dado \emph{int};
+        \item[$L$] é o rótulo (\emph{label}) da cláusula, armazena uma \emph{string} que representa a junção de suas proposições, por exemplo ($p \ou q \ou \n r$). Na estrutura representada por um tipo de dado \emph{char};
+        \item[$F$] é uma dupla $F<A,B>$ que guarda informações sobre quais foram as suas cláusulas pai, $A$ e $B$ são do tipo \emph{int};
+        \item[$T$] é a marcação binária de uma tautologia, representada na estrutura por um tipo de dado \emph{int};
+        \item[$P$] é uma quádrupla $P<L,N,F,N_e>$:
+        \begin{itemize}
+            \item[$L$] é o rótulo da proposição. Armazena uma string que representa um único literal, por exemplo $p$. Representado por um tipo de dado \emph{char};
+            \item[$N$] é a marcação binária de negativo da proposição. Na estrutura representado pelo tipo de dado \emph{int};
+            \item[$F$] é a marcação binária de enquadrado (\emph{framed}) da proposição. Na estrutura também representado por \emph{int};
+            \item[$N_e$] é um ponteiro para a próxima proposição;
+        \end{itemize}
+        Cada cláusula armazena um ponteiro para uma estrutura $P$ que guarda suas proposições;
+        \item[$N$] armazena um ponteiro para a próxima cláusula.
+    \end{itemize}
+
+%    Essas estruturas são preenchidas por um arquivo de entrada que aceita dois tipos de formatações, uma delas criada de forma empírica e outra utilizada para testar as fórmulas maiores que segue o padrão \emph{DIMACS Challenge}. Seja uma FNC: $p \ou q \e \n p \e \n q$, os arquivos de entrada aceitos são:
+%
+%    \texttt{\lstinputlisting[language=C, label=cod:input_1,
+%    caption={Exemplo de arquivo de entrada}]{codes/input_1.txt}}
+%
+%
+%    \texttt{\lstinputlisting[language=C, label=cod:input_2,
+%    caption={Exemplo de arquivo de entrada no formato DIMACS Challenge}]{codes/input_2.txt}}
+%
+%    A saída do programa assume dois tipos:
+%
+%    \begin{itemize}
+%        \item resumido: apresenta uma lista de informações relevantes como: nome da fórmula, binário que mostra se achou ou não a cláusula vazia, a identificação da cláusula em que a cláusula vazia foi encontrada, o número de threads que participaram da busca, o número de \emph{backtracks} efetuados, qual foi a thread que achou a cláusula vazia e o tempo em segundos de execução;
+%        \item extendido: mostra o conjunto completo de cláusulas geradas até encontrar a cláusula vazia, bem como o tempo de execução em segundos.
+%    \end{itemize}
+
+%    Para aumentar a flexibilidade dos testes, o programa recebe 2 parâmetros obrigatórios que indicam: a fórmula de entrada a ser processada e o número de \emph{threads} que irão processar, respectivamente. Com isso conseguiu-se a criação de \emph{shell scripts} para automatizar a bateria de testes.
+
+    Dentre as estratégias de resolução descritas na Seção \ref{estrategias} foram implementadas: simplificação, resolução linear, e estratégia dos literais enquadrados. Não foi implementado um mecanismo para remoção de tautologias, mas elas precisam ser identificadas, pois esse é um dos mecanismos que aciona o recurso de \emph{backtrack}.
+
+    \SubSection{Idéia Geral}
+    \label{ideia_geral}
+
+    A busca de uma cláusula vazia por resolução linear, gera uma estrutura em árvore. Cada cláusula pode ser combinada com $0$, $1$ ou $n$ outras cláusulas do conjunto.
+
+    
+%    \begin{equation}
+%        \footnotesize{
+%        \begin{nd}
+%            \hypo{h1}  {p \ou r}
+%            \hypo{h2}  {\n s \ou q}
+%            \hypo{h3}  {\n p \ou s}
+%            \hypo{h4}  {\n q}
+%            \hypo{h5}  {\n r}
+%        \end{nd}
+%        }
+%    \end{equation}
+
+    Sejam as cláusulas: ${p \ou r}$, ${\n s \ou q}$, ${\n p \ou s}$, ${\n q}$ e ${\n r}$, ao escolher a cláusula 1 ($p \ou r$) achamos um resolvente em 3 ($\n p \ou s$) ou em 5 ($\n r$). Mas também poderíamos iniciar a busca pela cláusula 2 ($\n s \ou q$) achando resonvente em 3 ($\n p \ou s$) ou em 4 ($\n q$), e assim sucessivamente. Dessa forma pode-se encontrar uma ramificação diferente para cada cláusula inicial selecionada.
+
+    \begin{figure}[!htb]
+        \centering
+        \caption{Estrutura em árvore de cláusulas candidatas}
+        \includegraphics[width=5cm]{images/tree_1.jpg}
+        \label{fig:tree_1}
+    \end{figure}
+
+    A Figura \ref{fig:tree_1} representa a estrutura em árvore das cláusulas candidatas para resolverem $p \ou r$ e $\n s \ou q$. A resolução linear propõe uma busca somente por um dos ramos dessa árvore, até que se encontre a cláusula vazia, se a cláusula vazia não for encontrada em todas as sub-ramificações, então deve-se iniciar a busca no próximo ramo da árvore. Em uma implementação sequencial a busca em profundidade ocasiona muito trabalho, caso se tenha que retornar aos primeiros filhos da árvore de busca.
+
+    A idéia essencial para as implementações foi a divisão das ramificações por \emph{threds}. Destinou-se $p$ \emph{threads} para resolver a sequência de cláusulas.
+
+    Em uma abordagem PRAM, poderíamos obter o seguinte pseudo-código:
+
+    \texttt{\lstinputlisting[language=C, label=cod:pram1,
+    caption={Abordagem PRAM para resolução linear com adição de \emph{threads}}]{codes/pram1.txt}}
+
+    A solução mostrada no Código \ref{cod:pram1} propõe a adição de \emph{threads} a medida em que novas cláusulas são adicionadas no conjunto. Para cada nova cláusula se aloca um novo \emph{thread}. As cláusulas estão alocadas na variável $c$. A Linha 1, garante a execução do código enquanto uma cláusula vazia não for encontrada no banco de cláusulas. Para processadores que vão de $1$ a $n$ (com $n$ sendo o número de cláusulas iniciais), se executa as seguintes instruções: \emph{c := resolve(c[j], search\_denied\_clauses(c[j]))} que adicionam ao banco de cláusulas todas as soluções de $c[j]$ resolvidas com um outro conjunto que retorna os resolventes de $c[j]$ (\emph{search\_denied\_clauses(c[j])}). O próximo passo é marcar quais foram as cláusulas resolvidas (\emph{c := mark\_resolved(c[j])}), que não serão selecionadas em uma próxima iteração. E por fim, se incrementa o número de processadores que irão executar no próximo passo do algoritmo. A criação de \emph{threads} nesse modelo, se dará em proporções de explosão combinatória, entretanto uma única \emph{thread} será responsável por executar a criação dos filhos da cláusula tratada por ela.
+
+    Uma segunda abordagem mais refinada e adaptada para uma implementação real propõe:
+
+    \texttt{\lstinputlisting[language=C, label=cod:pram2,
+    caption={Abordagem PRAM para resolução linear}]{codes/pram2.txt}}
+
+    Na abordagem do Código \ref{cod:pram2} apresenta-se algo bastante semelhante com o Código \ref{cod:pram1}, entretanto cada \emph{thread} fica responsável por resolver uma ramificação gerada a partir da cláusula de origem que lhe foi definida. Nesse caso não há adição de novos \emph{threads}, o que possibilita uma adaptação do modelo para uma implementação real, pois nela não teríamos disponíveis um número de \emph{threads} igual ao número de cláusulas.
+
+    Para isso, criou-se um mecanismo para distribuir as \emph{threads} a medida em que as ramificações forem resolvidas e em paralelo propõe-se a criação de uma lista anexa, que possui um repositório de elementos a serem resolvidos (essa estrutura corresponde a marcação das cláusulas resolvidas) que se chamou de \emph{lista de pendências}. Inicialmente a essa lista inicia com uma cópia das cláusulas iniciais, e a partir de então segue as regras:
+
+    \begin{enumerate}
+        \item ao se resolver uma cláusula, ela deve ser removida da lista de pendências;
+        \item ao ser gerada uma nova cláusula, ela deve ser adicionada na lista de pendências;
+    \end{enumerate}
+
+    Dessa forma se garante que essa lista armazenará todas as cláusulas que ainda precisam ser resolvidas. Ao se sacar o último elemento inserido nessa lista, realiza-se uma busca em profundidade pela árvore. Para iniciar uma busca em largura, basta selecionar o primeiro elemento inserido na lista, entretanto a busca em largura mostra-se ineficiente para o problema proposto, pois para cada nível gerado, todos os filhos devem ser criados, impossibilitando seu armazenamento em memória.
+
+    O método de \emph{backtrack} é garantido pela resolução de todos os elementos da lista de pendências. Quando a próxima cláusula dessa lista a ser resolvida for uma tautologia (Seção \ref{tautologia}) então, ignora-se essa cláusula e parte-se para a resolução da próxima até que a lista esteja vazia ou contenha apenas tautologias.
+
+     A lista de pendências indica para toda a árvore quais são as cláusulas a serem resolvidas, entretanto compartilha-lha entre as \emph{threads} gera um custo de sincronização que inviabiliza a implementação, por isso, cada \emph{thread} possui uma cópia da lista de cláusulas inicial (lista privada) e uma lista de pendências própria. Dessa forma eliminou-se qualquer tipo de colaboração entre as \emph{threads}, entretanto quase não há custo de sincronização, cada \emph{thread} pode trabalhar de forma independente, e é responsável por resolver apenas a ramificação inicial que lhe foi atribuída, caso essa ramificação não encontre uma cláusula vazia, então uma nova ramificação lhe é designada.
+
+     Quando uma thread encontra uma cláusula vazia, necessita comunicar as demais que o trabalho pode ser encerrado, nesse momento, há a necessidade de se criar um ponto de sincronismo. A estratégia adotada foi a utilização de um semáforo com a diretivas do OpenMP \texttt{omp\_func\_lock}, que possibilitam a gerência de sincronismo. Em determinados casos, em testes variados é possível que a a cláusula vazia seja encontrada em lugares diferentes no espaço de busca, pois um \emph{thread} pode ser executados mais rapidamente, ou ter prioridade de execução, para isso foram analisados o conjunto de cláusulas finais para o experimento.
+
+%    \SubSubSection{Colaboração entre as Cláusulas}
+%    \label{colab}
+%
+%    Nessa abordagem, eliminou-se o recurso de lista de pendências, o que ocasionou uma implementação incompleta. A idéia inicial foi analisar o comportamento de uma possível colaboração entre as cláusulas resolvidas de um \emph{thread} com as cláusulas resolvidas de outro. Cada \emph{thread} fica responsável por sacar um ramo a ser resolvido, e todas as cláusulas resolvidas são compartilhadas entre as \emph{threads}. Uma \emph{thread} não se preocupa caso não ache uma solução, sua participação é a geração das cláusulas. Cada uma delas, também não se preocupa em explorar todas as possibilidades de resolução de uma cláusula, mas assume que a primeira já é suficiente. Esse procedimento torna a abordagem incompleta, entretanto pendurar todas as cláusulas geradas, inviabiliza a colaboração entre as cláusulas.
+%
+%    Supondo que o um \emph{thread} $t_1$ precise de uma cláusula $\n r$ para resolver a cláusula atual que é $r$, linearmente $\n r$ seria encontrado apenas nas próximas cláusulas ou até mesmo não encontrado nessa ramificação, entretanto a \emph{thread} $t_2$ resolveu $p \ou r$ e achou $r$ e consequentemente compartilhou na lista global de cláusulas, então a \emph{thread} $t_1$ encontrará a cláusula vazia em um tempo consideravelmente menor.
+%
+%    Com essa abordagem foi necessário adotar um sistema de sincronização no momento de se inserir uma nova cláusula resolvida no banco de cláusulas, o sistema adotado foi a utilização de um semáforo com a diretivas do OpenMP \texttt{omp\_func\_lock}, que possibilitam a gerência de sincronismo.
+%
+%    Essa característica de colaboração não pode ser aplicada em uma estrutura completa, pois cada resolução gera inúmeras cláusulas a serem sincronizadas com o banco de cláusulas global, o que gera um alto custo de sincronização e alocação de espaço em memória.
+
+    \Section{Resultados}
+
+%    Esse capítulo descreve os testes realizados, mostra os resultados para os experimentos de Colaboração entre Cláusulas e Divisão de Trabalho por Threads e aborda uma discussão dos resultados encontrados, que estão respectivamente nas Seções \ref{testes}, \ref{result:colab}, \ref{result:thread} e \ref{discussao}
+
+    \SubSection{Descrição dos Testes}
+    \label{testes}
+
+    Para a realização dos testes utilizou-se fórmulas proposicionais não satisfatíveis. A busca por uma prova parte de um sistema refutacional e uma formula não satisfatível pode ser provada por esse sistema. As fórmulas testadas foram retiradas do \emph{DIMACS Sat Benchmarks} e estão detalhadas na Tabela \ref{tab:formulas}.
+
+    \begin{table}[!htb]
+    \caption{Fórmulas testadas}
+    \label{tab:formulas}
+    \scriptsize{
+        \begin{center}
+            \begin{tabular}{|l|l|l|l|}
+            \hline
+            Nome & \multicolumn{1}{c|}{Tipo} & \multicolumn{1}{c|}{Literais} & \multicolumn{1}{c|}{Cláusulas}  \\
+            \hline
+            aim-50-1\_6-no-1 & \multicolumn{1}{c|}{aim} & \multicolumn{1}{c|}{50} & \multicolumn{1}{c|}{80}  \\
+            \hline
+            aim-50-1\_6-no-3 & \multicolumn{1}{c|}{aim} & \multicolumn{1}{c|}{50} & \multicolumn{1}{c|}{80}  \\
+            \hline
+            aim-50-1\_6-no-4 & \multicolumn{1}{c|}{aim} & \multicolumn{1}{c|}{50} & \multicolumn{1}{c|}{80}  \\
+            \hline
+            dubois25 & \multicolumn{1}{c|}{dub} & \multicolumn{1}{c|}{75} & \multicolumn{1}{c|}{200}  \\
+            \hline
+            dubois50 & \multicolumn{1}{c|}{dub} & \multicolumn{1}{c|}{150} & \multicolumn{1}{c|}{400}  \\
+            \hline
+            dubois100 & \multicolumn{1}{c|}{dub} & \multicolumn{1}{c|}{300} & \multicolumn{1}{c|}{800}  \\
+            \hline
+            hole6 & \multicolumn{1}{c|}{hole} & \multicolumn{1}{c|}{42} & \multicolumn{1}{c|}{133}  \\
+            \hline
+            hole7 & \multicolumn{1}{c|}{hole} & \multicolumn{1}{c|}{56} & \multicolumn{1}{c|}{204}  \\
+            \hline
+            \end{tabular}
+        \end{center}
+    }
+    \end{table}
+
+    Na Tabela \ref{tab:formulas} estão informações referentes ao nome da cláusula, seu tipo, a quantidade de literais e a quantidade de cláusulas.
+
+%    Formulas do mesmo tipo (\emph{aim}, \emph{dub} e \emph{hole}) significam que foram geradas da mesma forma, no qual:
+%
+%    \begin{itemize}
+%        \item \emph{aim}: de Eiji Miyano $<$miyano@csce.kyushu-u.ac.jp$>$, geradas automaticamente;
+%        \item \emph{dub}: de Olivier Dubois $<$dubois@laforia.ibp.fr$>$, geradas automaticamente;
+%        \item \emph{hole}: de John Hooker $<$jh38+@andrew.cmu.edu$>$, problema do buraco de pombo. O problema pergunta se é possível colocar $n+1$ pombos em $n$ buracos sem ter dois pombos no mesmo buraco.
+%    \end{itemize}
+
+    Os testes foram realizados na máquina \emph{Alt} que se encontra no Departamento de Informática da UFPR. Sua configuração é composta por 8 núcleos de processamento Intel Xeon E5345 de 2.33GHz e 7GB de memória RAM.
+
+    Nos testes, cada fórmula foi testada dez vezes, tendo algumas que levaram alguns minutos para alcançar o resultado, o que impossibilitou experimentos com maior número de repetições. Para essa população foi gerada a média do tempo de execução e o desvio padrão. Os testes foram realizados com 1, 2, 4, 8, 16, 32 e 64 \emph{threads} e a unidade de medida de tempo adotada foi segundos.
+
+    %\SubSection{Resultados para Colaboração entre Cláusulas}
+%    \label{result:colab}
+%
+%    Para garantir que o sistema chegasse a um resultado em um tempo considerável, pelo método ser incompleto, se estabeleceu a quantidade máxima de 3500 cláusulas resolvidas, caso não se ache a solução até esse limite, então nada se pode dizer sobre o teorema, mas caso a cláusula vazia seja encontrada, então o teorema é provado.
+%
+%    A Tabela \ref{tab:colab} mostra os resultados obtidos para o teste de Colaboração entre Cláusulas:
+%
+%    \begin{table*}[!htb]
+%    \caption{Resultados para Colaboração entre Cláusulas para 2, 4, 8 e 16 \emph{threads}}
+%    \label{tab:colab}
+%    \small{
+%        \begin{center}
+%            \begin{tabular}{|l|c|c|c|c|}
+%            \hline
+%             & \multicolumn{4}{c|}{\emph{threads}} \\
+%            \hline
+%            nome & 2 & 4 & 8 & 16 \\
+%            \hline
+%             & 617-1628 (97\%) & 630-3306 (43\%) & 1400-3479 (39\%) & 1893-3438 (21\%) \\
+%            aim-50-1\_6-no-1 & 0,119s & 1,978s & 2,791s & 2,831s \\
+%             & 0,071 & 1,55 & 1,447 & 1,446 \\
+%            \hline
+%             & 934-1149 (86\%) & 406-3047 (80\%) & 1286-3485 (34\%) & 1249-3465 (41\%) \\
+%            aim-50-1\_6-no-3 & 0,221s & 0,402s & 2,195s & 2,388s \\
+%             & 0,037 & 0,634 & 1,748 & 1,52 \\
+%            \hline
+%             & 969-2068 (95\%) & 802-3458 (93\%) & 620-3492 (56\%) & 1385-3295 (41\%) \\
+%            aim-50-1\_6-no-4 & 0,610s & 1,469s & 1,699s & 2,391s \\
+%             & 0,257 & 1,095 & 1,5 & 1,143 \\
+%            \hline
+%             & 1136-1384 (89\%) & 1616-2566 (69\%) & 1420-3303(19\%) & 1977-3360 (8\%) \\
+%            dubois25 & 0,672s & 3,345s & 4,548s & 6,234s \\
+%             & 0,169 & 1,274 & 2,456 & 2,75 \\
+%            \hline
+%            dubois50 & - & - & - & - \\
+%            \hline
+%            dubois100 & - & - & - & - \\
+%            \hline
+%             & 156-302 (98\%) & 216-441 (91\%) & 236-783 (95\%) & 591-949 (87\%) \\
+%            hole6 & 0,031s & 0,042s & 0,981s & 1,041s \\
+%             & 0,001 & 0,621 & 0,168 &  \\
+%            \hline
+%             & 244-476 (89\%) & 239-518 (78\%) & 417-936 (81\%) & 722-1354 (21\%) \\
+%            hole7 & 0,032s & 0,077s & 0,712s & 0,987s \\
+%             & 0,001 & 0,141 & 0,787 & 1,144 \\
+%            \hline
+%            \end{tabular}
+%        \end{center}
+%    }
+%    \end{table*}
+%
+%    A Tabela \ref{tab:colab} mostra as fórmulas testadas e para cada uma delas os resultados obtidos para a execução com 2, 4, 8 e 16 \emph{threads} respectivamente. Cada resultado é composto por 3 linhas, a primeira mostra o intervalo de cláusulas necessárias para se obter a cláusula vazia. Entre parênteses estão as porcentagens das fórmulas que conseguiram encontrar a cláusula vazia. A segunda linha mostra a média de execução do algoritmo e a terceira mostra o desvio padrão da população analisada.
+%
+%    Testes com 1 \emph{thread} foram desconsiderados, pois pela implementação ser incompleta, execução com 1 \emph{threads} pode não chegar a um resultado com o limite imposto.
+%
+%    As fórmulas \emph{dubois50} e \emph{dubois100} não encontraram uma cláusula vazia nos testes realizados.
+
+    \SubSection{Resultados Obtidos}
+    \label{result:thread}
+
+    As tabelas \ref{tab:threads1} e \ref{tab:threads2} dispõem os resultados obtidos e contém para cada fórmula, informações correspondentes ao número de \emph{threads} executados. Em cada célula encontram-se: um ou mais números de cláusulas geradas até a obtenção da cláusula vazia e as \emph{threads} em que foram encontradas. A segunda linha indica o tempo gasto para a execução, e a terceira linha o desvio padrão.
+
+    \begin{table*}[!htb]
+    \caption{Resultados para Divisão de Trabalho com 1, 2, 4 e 8 \emph{threads}}
+    \label{tab:threads1}
+    \scriptsize{
+        \begin{center}
+            \begin{tabular}{|l|c|c|c|c|}
+            \hline
+             & \multicolumn{4}{c|}{\emph{threads}} \\
+            \hline
+            nome & 1 & 2 & 4 & 8 \\
+            \hline
+             & 3548  & 2047 - 2 & 1631 - 4 & 990 - 8 \\
+            aim-50-1\_6-no-1 & 200,121s & 30,578s & 55,773s & 61s \\
+             & 3,322 & 1,325 & 4,906 & 7,446 \\
+            \hline
+             & 4627 & 3056 - 2 & 1200 - 3 & 1200 - 3 \\
+            aim-50-1\_6-no-3 & 171,875s & 37,757s & 23,234s & 77,82s \\
+             & 3,021 & 3,33 & 3,90 & 11,316 \\
+            \hline
+             & 2487 & 1927 - 2 & 1927 - 2 & 845 - 7 \\
+            aim-50-1\_6-no-4 & 312,121s & 22,468s & 53,328s & 30,687s \\
+             & 3,321 & 0,441 & 1,445 & 6,529 \\
+            \hline
+             & 234 & 234 - 2 & {234, 238, 243, 252} - {1, 2, 3, 4} & {234, 243, 252} - {1,3,4} \\
+            dubois25 & 0,001s & 0,062s & 0,156s & 0,39s \\
+             & 0,001 & 0,019 & 0,06 & 0,118 \\
+            \hline
+             & 434 & 434 - 2 & {452, 438, 434} - {3, 4, 1} & {434, 438} - {1,4} \\
+            dubois50 & 0,845s & 0,125s & 0,375s & 0,945s \\
+             & 0,0124 & 0,019 & 0,062 & 0,241 \\
+            \hline
+             & 834 & 834 - 1 & {843, 852, 834} - {1, 2, 3} & {834, 838, 843, 865} - {1, 2, 3, 5} \\
+            dubois100 & 0,125s & 0,226s & 0,804s & 2,054s \\
+             & 0,002 & 0,032 & 0,158 & 0,255 \\
+            \hline
+             & 979 & 980 - 2 & {980, 982, 979} - {1, 3, 4} & {980, 984, 979} - {1,6,4} \\
+            hole6 & 0,875s & 1,601s & 3,992s & 9,203s \\
+             & 0,045 & 0,098 & 0,208 & 0,460 \\
+            \hline
+             & 1582 & {1583, 1582} - {1, 2} & {1584, 1582, 1583} - {1, 2, 3} & {1583, 1587, 1584} - {2, 3, 6} \\
+            hole7 & 2,375s & 3,289s & 7,773s & 18,64s \\
+             & 0,012 & 0,166 & 0,242 & 0,395 \\
+            \hline
+            \end{tabular}
+
+        \end{center}
+    }
+    \end{table*}
+
+    \begin{table*}[!htb]
+    \caption{Resultados para Divisão de Trabalho com 16, 32 e 64 \emph{threads}}
+    \label{tab:threads2}
+    \scriptsize{
+        \begin{center}
+            \begin{tabular}{|l|c|c|c|}
+            \hline
+             & \multicolumn{3}{c|}{\emph{threads}} \\
+            \hline
+            nome & 16 & 32 & 64 \\
+            \hline
+             & 990 - 8 & 389 - 17 & 378 - 62 \\
+            aim-50-1\_6-no-1 & 127,429s & 35,187s & 46,851s \\
+             & 17,8 & 0,4 & 3,675 \\
+            \hline
+             & 700 - 10 & {700, 716} - {10, 26} & 247 - 58 \\
+            aim-50-1\_6-no-3 & 57,914s & 103,476s & 24,296s \\
+             & 9,024 & 28,51 & 0,549 \\
+            \hline
+             & 692 - 14 & 692 - 14 & 413 - 64 \\
+            aim-50-1\_6-no-4 & 50,921s & 104,679s & 52,539 \\
+             & 0,568 & 16,46 & 8,060 \\
+            \hline
+             & {264, 234, 265, 238} - {1,12, 13, 16} & {264, 238, 234, 265} - {1, 4, 9, 20} & {234, 252, 265, 238} - {1, 3, 4, 37} \\
+            dubois25 & 0,851s & 1,828s & 3,351s \\
+             & 0,193 & 0,341 & 0,978 \\
+            \hline
+             & {452, 434, 464, 452} - {3, 1, 12, 3} & {465, 452, 465, 443} - {1, 3, 9,} & {438, 434, 464, 465} - {4, 1, 12, 21} \\
+            dubois50 & 1,757s & 3,773s & 8,429s \\
+             & 0,347 & 0,772 & 1,017 \\
+            \hline
+             & {834, 864, 865} - {9, 12, 4}  & {834, 864, 865} - {1, 28, 32} & {864, 865, 834} - {1, 17, 48} \\
+            dubois100 & 4,312s & 9,375s & 16,648s \\
+             & 0,63 & 1,018 & 1,575 \\
+            \hline
+             & {1019, 979, 973} - {1, 5, 7} & {1019, 931} - {7, 3} & 1019 - 7 \\
+            hole6 & 24,539s & 51,539s & 105,148s \\
+             & 3,107 & 4,799 & 16,298 \\
+            \hline
+             & {1588, 1586, 1583} - {2, 5, 7} & {1588, 1583, 1587} - {2, 6, 7} & {1558, 1586} - {7, 5} \\
+            hole7 & 43,71s & 129,656s & 273,929s \\
+             & 15,364 & 27,591 & 59,808 \\
+            \hline
+            \end{tabular}
+        \end{center}
+    }
+    \end{table*}
+
+    \Section{Discussão dos Resultados}
+
+%    \SubSection{Discussão dos Resultados para Colaboração entre \emph{Threads}}
+%
+%    Para analisar graficamente os dados da Tabela \ref{tab:colab} apresenta-se dois gráficos nas Figuras \ref{fig:colab_clauses} e \ref{fig:colab_tempo} que resumem as menores cláusulas geradas e o tempo gasto (em segundos) para a abordagem de colaboração entre cláusulas, respectivamente.
+%
+%    \begin{figure}[!htb]
+%        \centering
+%        \caption{Gráfico das menores cláusulas geradas para abordagem de colaboração entre cláusulas}
+%        \includegraphics[width=8.5cm]{images/colab_clauses.jpg}
+%        \label{fig:colab_clauses}
+%    \end{figure}
+%
+%    No gráfico da Figura \ref{fig:colab_clauses} é possível observar que as fórmulas \emph{aim-50-1\_6-no-3}, \emph{aim-50-1\_6-no-4}, \emph{dubois25} e \emph{hole7}, ao serem processadas pelo algoritmo de colaboração entre \emph{threads}, conseguiram encontrar a cláusula vazia com uma menor quantidade de cláusulas geradas a medida em que se adicionou \emph{threads} na execução.
+%
+%    Com esses resultados é possível concluir que o sistema de colaboração de cláusulas, consegue reduzir significativamente o número de cláusulas geradas, entretanto é difícil estabelecer uma padrão de comportamento, pois não se sabe a ordem de execução das \emph{threads}.
+%
+%    Esse método mostrou-se ineficiente se o objetivo for encontrar a cláusula vazia no menor tempo de execução possível, como pode-se observar no gráfico da Figura \ref{fig:colab_tempo}, os tempos aumentam a medida em que as \emph{threads} são inseridas, entretanto o método mostra-se eficiente se se deseja obter um menor caminho para se encontrar a cláusula vazia.
+%
+%    As fórmulas \emph{aim-50-1\_6-no-1}, e \emph{hole6} não apresentaram resultado significativo no teste.
+%
+%    \begin{figure}[!htb]
+%        \centering
+%        \caption{Gráfico de tempo de execução para abordagem de colaboração entre cláusulas}
+%        \includegraphics[width=8.5cm]{images/colab_tempo.jpg}
+%        \label{fig:colab_tempo}
+%    \end{figure}
+
+    Os gráficos plotados nas Figuras \ref{fig:threads_clauses} e \ref{fig:threads_tempo} indicam a quantidade de cláusulas geradas até encontrar a cláusula vazia em relação ao número de \emph{threads}. A relação de tempo de execução por número de \emph{threads} respectivamente.
+
+    \begin{figure}[!htb]
+        \centering
+        \caption{Gráfico das menores cláusulas geradas}
+        \includegraphics[width=9cm]{images/threads_clauses.jpg}
+        \label{fig:threads_clauses}
+    \end{figure}
+
+%     No gráfico da Figura \ref{fig:threads_clauses}, as fórmulas \emph{aim-50-1\_6-no-1}, \emph{aim-50-1\_6-no-3} e \emph{aim-50-1\_6-no-4} apresentam considerável redução de cláusulas geradas a medida em que \emph{threads} são adicionados. As fórmulas \emph{dubois} não tiveram considerável evolução, com isso é possível concluir que as cláusulas vazias nessas fórmulas são encontradas com um mesmo número de cláusulas geradas, independente da ramificação escolhida para trabalhar.
+%
+%     As fórmulas do tipo \emph{hole} apresentaram uma pequena diminuição de cláusulas geradas apenas para testes com 32 ou 64 \emph{threads}.
+
+    \begin{figure}[!htb]
+        \centering
+        \caption{Gráfico de tempo de execução}
+        \includegraphics[width=9cm]{images/threads_tempo.jpg}
+        \label{fig:threads_tempo}
+    \end{figure}
+
+%    A Figura \ref{fig:threads_tempo} mostra um gráfico, no qual é possível perceber que se consegue uma redução considerável a medida em que se adiciona \emph{threads}, e é possível concluir ainda que, nem sempre um número elevado de threads acha a melhor solução, pois o custo para resolver várias ramificações ao mesmo tempo em um ambiente de memória compartilhada, gera concorrência na escrita em memória.
+
+    A Figura \ref{fig:threads_tempo} mostra um gráfico, no qual em alguns casos (\emph{aim-50-1\_6-no-1}, \emph{aim-50-1\_6-no-3} e \emph{aim-50-1\_6-no-4}) é notória a redução de tempo a medida em que se adiciona \emph{threads}, entretanto em um cenário geral isso não foi observado pois, cada \emph{thread} cuida de determinada ramificação de cláusulas, e para cada uma dessas ramificações são gerados números diferentes de filhos. A geração de todos os filhos garante que o método será completo, entretanto o custo de geração em um ambiente paralelo de memória compartilhada, gera concorrência na escrita, o que aumenta o tempo de execução em alguns casos.
+
+    A Tabela \ref{tab:filhos} ilustra a quantidade de filhos gerados a partir da soma de todos os filhos por todos os ramos para as fórmulas \emph{aim-50-1\_6-no-3}, \emph{hole6} e \emph{dubois25} bem como a média de filhos encontrados pelas \emph{threads}. Os dados foram computados para 1, 2, 4, 8, 16, 32 e 64 \emph{threads}.
+
+    \begin{table*}[!htb]
+    \caption{Soma do número de filhos e média de filhos geradas}
+    \label{tab:filhos}
+    \scriptsize{
+        \begin{center}
+            \begin{tabular}{|l|l|l|l|l|l|l|l|l|}
+            \cline{3-9}
+            \multicolumn{1}{l}{} &  & \multicolumn{1}{c|}{1} & \multicolumn{1}{c|}{2} & \multicolumn{1}{c|}{4} & \multicolumn{1}{c|}{8} & \multicolumn{1}{c|}{16} & \multicolumn{1}{c|}{32} & \multicolumn{1}{c|}{64} \\
+            \hline
+            aim-50-1\_6-no-3 & \multicolumn{1}{c|}{soma} & \multicolumn{1}{c|}{5629} & \multicolumn{1}{c|}{6843} & \multicolumn{1}{c|}{5730} & \multicolumn{1}{c|}{11781} & \multicolumn{1}{c|}{13048} & \multicolumn{1}{c|}{26138} & \multicolumn{1}{c|}{15241} \\
+            \cline{2-9}
+             & \multicolumn{1}{c|}{média} & \multicolumn{1}{c|}{5629} & \multicolumn{1}{c|}{3422} & \multicolumn{1}{c|}{1433} & \multicolumn{1}{c|}{1473} & \multicolumn{1}{c|}{816} & \multicolumn{1}{c|}{817} & \multicolumn{1}{c|}{238} \\
+            \hline
+            hole6 & soma & \multicolumn{1}{c|}{1073} & \multicolumn{1}{c|}{2132} & \multicolumn{1}{c|}{3844} & \multicolumn{1}{c|}{7249} & \multicolumn{1}{c|}{13897} & \multicolumn{1}{c|}{29395} & \multicolumn{1}{c|}{54186} \\
+            \cline{2-9}
+             & média & \multicolumn{1}{c|}{1073} & \multicolumn{1}{c|}{1066} & \multicolumn{1}{c|}{961} & \multicolumn{1}{c|}{906} & \multicolumn{1}{c|}{869} & \multicolumn{1}{c|}{919} & \multicolumn{1}{c|}{874} \\
+            \hline
+            dubois25 & soma & \multicolumn{1}{c|}{34} & \multicolumn{1}{c|}{71} & \multicolumn{1}{c|}{101} & \multicolumn{1}{c|}{295} & \multicolumn{1}{c|}{681} & \multicolumn{1}{c|}{1800} & \multicolumn{1}{c|}{2601} \\
+            \cline{2-9}
+             & média & \multicolumn{1}{c|}{34} & \multicolumn{1}{c|}{36} & \multicolumn{1}{c|}{25} & \multicolumn{1}{c|}{37} & \multicolumn{1}{c|}{43} & \multicolumn{1}{c|}{56} & \multicolumn{1}{c|}{41} \\
+            \hline
+        \end{tabular}
+        \end{center}
+    }
+    \end{table*}
+
+    Nos casos em que a média de cláusulas e a soma dos filhos é menor, o tempo de execução também diminui. Para a fórmula \emph{aim-50-1\_6-no-3} a execução com 64 threads foi mais rápida pois, apesar de gerados vários filhos (15241) a média do número de cláusulas geradas ficou em (238). As fórmulas \emph{hole6} e \emph{dubois25} não apresentam uma ganho de \emph{speedup} pois em geral o custo de criação dos filhos cresce linearmente e a redução da média de cláusulas geradas não diminui a ponto de tornar a execução do algoritmo mais rápida.
+
+%    Esse método ainda se caracteriza em dois tipos de busca, se a intenção for achar o menor caminho, um número maior de threads pode ser definido, entretanto se a intenção for encontrar o a cláusula vazia em um menor tempo não se importando com a quantidade de cláusulas geradas, então poucas \emph{threads} são suficiente.
+
+%    Para a fórmula \emph{aim-50-1\_6-no-1} o melhor desempenho em relação ao tempo foi encontrado quando o processo utilizou 2 \emph{threads}. Mas o caminho mais curto para se achar uma cláusula vazia foi encontrado apenas quando executada com 64 \emph{threads}.
+
+    A forma de construção das fórmulas influencia diretamente no tempo necessário para encontrar uma cláusula vazia, nem sempre o número de literais ou cláusulas é proporcional ao tempo de busca. Por exemplo, as fórmulas do tipo \emph{aim}, que têm cerca de 80 cláusulas, precisaram de um maior esforço para encontrar uma cláusula vazia, enquanto as fórmulas do tipo \emph{dubois}, especificamente a fórmula \emph{dubois100} apresentam 10 vezes mais cláusulas que as do tipo \emph{aim}, e mesmo assim são executadas em um tempo muito menor. Isso se deve a rapidez com que a cláusula vazia é encontrada no espaço de busca. Outro fator que influencia no \emph{speedup} é a quantidade filhos que cada cláusula necessita gerar, pois, quanto mais filhos a serem gerados maior o tempo de execução do algoritmo.
+
+    A variação no desvio padrão de alguns testes se dá pela velocidade em que determinados \emph{treads} são executados, caso um \emph{thread} que leve ao resultado mais rapidamente seja executado primeiro ou ganhe prioridade na gravação dos dados em memória, a execução do programa levará menos tempo. Por exemplo, na fórmula \emph{aim-50-1\_6-no-4} em média as ocorrências para a execução com 32 threads ficam na casa dos 104 segundos, entretanto em uma das ocorrências o programa consegue terminar em 52,75 segundos.
+
+    \Section{Conclusões}
+
+    A prova por resolução é um problema que tem como característica a explosão combinatória. Resolvê-lo em um tempo viável depende de quais estratégias são adotadas. Algumas dessas estratégias foram implementadas nesse trabalho, entre elas: resolução linear, literais enquadrados, simplificação e duas abordagens de processamento paralelo.
+
+%    Na primeira abordagem buscou-se testar o quanto os \emph{threads} que estão cuidando de ramificações diferenciadas na árvore de prova podem cooperar; na segunda abordagem utilizou-se a estratégia de cada \emph{thread} cuidar de sua ramificação, não interferindo nas buscas efetuadas pelas outras.
+
+    Apesar do processamento paralelo, a geração de todos os filhos da árvore de prova, mostrou que a adição de \emph{threads} em geral, não aumenta o \emph{speedup} do algoritmo. Pois o custo para criação de todas as combinações de cláusulas, aumenta proporcionalmente a medida em que são adicionados \emph{threads} no sistema. Entretanto ao se aumentar o número de buscas em paralelo pelo espaço de cláusulas, pode-se observar que a cláusula vazia pode ser encontrada por um caminho mais curto.
+
+    \SubSection{Trabalhos Futuros}
+
+    É possível explorar outro tipo de paralelismo, ao se utilizar \emph{threads} específicos para aplicar estratégias de resolução descritas na Seção \ref{estrategias}, com isso esses \emph{threads} ficam responsáveis por diminuir o espaço de busca e remover cláusulas que não iriam servir para a resolução do problema.
+
+    A criação de todas as cláusulas tornou o algoritmo inviável, entretanto pode-se aplicar métodos para que os filhos sejam gerados somente caso um \emph{backtrack} seja necessário, o que tornaria o algoritmo mais eficiente.
+
+    Uma outra abordagem também propõe um método relaxado, que abandona ramificações que não foram resolvidas em determinado tempo, essa abordagem aproveita melhor o paralelismo, pois como visto nos resultados, ao testar uma fórmula com vários \emph{threads}, a cláusula vazia é encontrada em um menor tempo.
+
+%    Explorar o segundo modelo em PRAM descrito na Seção \ref{ideia_geral} pode ser aplicada a estrutura CUDA que conta com vários multi-processadores. Dessa forma garante-se a busca por todas as cláusulas iniciais da fórmula.
+
+    \bibliographystyle{wscad2010}
+    \bibliography{bib/bibliografia}
+
+\end{document} 

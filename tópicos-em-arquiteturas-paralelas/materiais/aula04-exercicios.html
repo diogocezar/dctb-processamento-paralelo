@@ -1,0 +1,153 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html;charset=ISO-8859-1" http-equiv="Content-Type">
+  <title>Introdu&ccedil;&atilde;o &agrave; Computa&ccedil;&atilde;o
+Paralela</title>
+</head>
+<body>
+<h1>Aula 04 - exerc&iacute;cios<br>
+</h1>
+<h2>Exerc&iacute;cio 01: tumour therapy</h2>
+<h1></h1>
+<p>
+In this assignment you will use OpenMP to solve part of a real
+problem.
+</p>
+<p>The problem is small and simplified part of a tumour therapy
+computation .
+You are given a file containing the coordinates for a , fairly large,
+number of
+cells. Each line in the file contains three floating point numbers, the
+x-, y-
+and z-coordinate for the nucleus of that particular cell. The task is
+to write
+a program that computes the pairwise distances between all the cells.
+So, let </p>
+<p><!-- MATH
+ $\mathbf{c}_j = (x_j,y_j,z_j)$
+ -->
+<span class="MATH"><img
+ style="border: 0px solid ; width: 111px; height: 32px;"
+ src="exercicios/aula04-ex1-1.png" alt="$\mathbf{c}_j = (x_j,y_j,z_j)$"
+ align="middle"></span>and<!-- MATH
+ $\mathbf{c}_k = (x_k,y_k,z_k)$
+ --> <span
+ class="MATH"><img
+ style="border: 0px solid ; width: 115px; height: 32px;"
+ src="exercicios/aula04-ex1-2.png" alt="$\mathbf{c}_k = (x_k,y_k,z_k)$"
+ align="middle"></span>
+be coordinates for two cells, then your program should
+compute
+<br>
+</p>
+<div class="mathdisplay" align="right"><!-- MATH
+ \begin{equation}
+d(\mathbf{c}_j,\mathbf{c}_k) 
+   =  \sqrt{ (x_j-x_k)^2 + (y_j-y_k)^2 + (z_j-z_k)^2 }
+\end{equation}
+ -->
+<table align="center" width="100%">
+  <tbody>
+    <tr valign="middle">
+      <td align="center" nowrap="nowrap"><img
+ style="border: 0px solid ; width: 344px; height: 36px;"
+ src="exercicios/aula04-ex1-3.png"
+ alt="\begin{displaymath}
+d(\mathbf{c}_j,\mathbf{c}_k)
+= \sqrt{ (x_j-x_k)^2 + (y_j-y_k)^2 + (z_j-z_k)^2 }
+\end{displaymath}"></td>
+      <td class="eqno" align="right" width="10">
+(<span class="arabic">1</span>)</td>
+    </tr>
+  </tbody>
+</table>
+<br clear="all">
+</div>
+for all j and k, j not equal to k
+<p>Due to symmetries in the coordinates, many of the distances are the
+same,
+so one should compute all distinct distances and the number of times
+each
+distance occurs.
+</p>
+<p></p>
+<h3><a name="SECTION00071000000000000000"><span
+ style="font-weight: bold;"></span> A very small example. </a></h3>
+<h2></h2>
+<p>
+Suppose that the cells are located in
+the corners
+of a cube, having side one. Looking at one corner there are three cells
+at
+a distance of one, three cells have the distance sqrt(2) and one cell
+is at the distance&nbsp;<span class="MATH"></span>sqrt(3). Due to
+symmetry (there are eight corners in the cube), the
+distance
+one, and sqrt(2), occur 24 times each. sqrt(3) occurs 8 times. In this
+example,
+the program should produce a file containing:
+</p>
+<p></p>
+<pre>    1.00000000000000   24<br>    1.41421356237310   24<br>    1.73205080756888   8<br><br>   n_uniq     3<br>   sum_uniq  56<br></pre>
+<p>
+<tt>n_uniq</tt> is the number of unique distance values, and <tt>sum_uniq</tt>
+the total number
+of distance values.
+</p>
+<p>The input file may look like:
+</p>
+<p></p>
+<pre>0 0 0<br>1 0 0<br>1 1 0<br>0 1 0<br>0 0 1<br>1 0 1<br>1 1 1<br>0 1 1<br></pre>
+<p>
+In the assignment you may not use the fact that there are symmetries,
+so you
+should assume that the coordinates have random values. You should use
+the fact
+that two distance values are at least 0.01 apart. If they are closer
+than this,
+it is caused by roundoff and we regard such distances as being equal.
+So if one
+distance, in the cube, is 1.414215 and the other is 1.414213, they are
+regarded
+as being equal. sqrt(2) and sqrt(3) are more than 0.01 apart, so they
+are
+different distances.
+</p>
+<p>NOTE: in the real application there would be some 700 000 cells.
+This makes it
+impossible to allocate an array to store all the distances. Such an
+array would
+require some 0.5 &times; 700000^2 = 2.45 &times; 10^11 elements (0.5,
+since d(cj, ck) = d(ck,
+cj)) . So, it is not possible to first compute all the distances and
+then go
+through the array and count the number of copies. Since this course
+deals with
+real programming, and not how to write toy programs, your code is not
+allowed to
+allocate space for all (or half of all) the distances either. In this
+assignment
+there are only some 20 000 cells, but you should think of them as being
+700 000.
+Note that you are allowed to store the coordinates of the cells.
+</p>
+<p>Write a program in C and parallelize it using OpenMP. You may assume
+that we will never
+use more than eight processors. It is not hard to get a good speedup in
+this
+application. Test your program on the provided input file, <big><big><a
+ href="exercicios/cells.gz"><tt>cells</tt></a></big></big> . To debug
+your program I suggest that you make a shorter file. Try not to waste
+energy!
+</p>
+<h3>Entregar:</h3>
+Arquivo com o c&oacute;digo fonte chamado tumor-&lt;login&gt;.c aonde
+&lt;login&gt; &eacute; o seu login.<br>
+<h2>Entrega</h2>
+Enviar um email para '<span style="font-weight: bold;">danielw-icp</span>'
+com o subject '<span style="font-weight: bold;">ICP - aula4 - ex1</span>'
+contendo as respostas dos exerc&iacute;cios.<br>
+Prazo limite: <span style="font-weight: bold;">22.03.2010</span><br>
+</body>
+</html>

@@ -1,0 +1,27 @@
+Aula 04
+-------
+
+* Escrevendo código em OpenMP
+
+  - Sintaxe
+    + Diretivas iniciam com '#pragma omp'
+    + case sensitive
+    + aceitam espaços entre as palavras
+    + quebras de linha devem conter '\'
+    
+    + ***ATENÇÃO***
+      Não há mensagem nem warning para erros de grafia
+      Utilizar '-Wall'
+      
+  - Análise do código de aula04.txt
+    + palavra-chave 'restrict': C99
+      - garante acesso apenas através deste ponteiro para aquela
+        região de memória
+      - permite otimizações por parte do compilador
+
+  - Compilando código
+    + gcc -o <programa> -fopenmp -std=gnu99 <arq.c>
+
+  - Compilação condicional
+    + Diretiva _OPENMP
+    

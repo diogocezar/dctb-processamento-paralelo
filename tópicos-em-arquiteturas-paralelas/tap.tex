@@ -1,0 +1,1057 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[brazil]{babel}
+\usepackage[latin1]{inputenc}
+\usepackage[pdftex]{graphicx}
+\usepackage{wrapfig}
+\usepackage{fancyhdr}
+\usepackage{color}
+\usepackage{ifthen}
+\usepackage{amsfonts}
+\usepackage{indentfirst}
+\usepackage{listings}
+\usepackage[lmargin=2.5cm,rmargin=2.5cm,tmargin=2.5cm,bmargin=3.5cm]{geometry}
+\usepackage{url}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% C O N F I G U R A Ç Õ E S  D O S   C Ó D I G O S %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\lstset{numbers=left, stepnumber=1, firstnumber=1,
+numberstyle=\tiny, extendedchars=true, breaklines=true,frame=tb,
+basicstyle=\footnotesize, stringstyle=\tiny, showstringspaces=false}
+
+\renewcommand{\lstlistingname}{Código}
+\renewcommand{\lstlistlistingname}{Lista de Códigos}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% C O N F I G U R A Ç Õ E S   D A   P Á G I N A %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\footskip=1cm \setcounter{tocdepth}{5} \setcounter{secnumdepth}{5}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% E S P A Ç A M E N T O   D U P L O %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\renewcommand{\baselinestretch}{1.5}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% C O M A N D O S   D E   S U B S T I T U I Ç Ã O %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\header}        [1]{\def\imprimeheader{#1}}
+\newcommand{\footer}        [1]{\def\imprimefooter{#1}}
+\newcommand{\titulo}        [1]{\def\imprimetitulo{#1}}
+\newcommand{\subtitulo}     [1]{\def\imprimesubtitulo{#1}}
+\newcommand{\autor}         [1]{\def\imprimeautor{#1}}
+\newcommand{\orientador}    [1]{\def\imprimeorientador{#1}}
+\newcommand{\local}         [1]{\def\imprimelocal{#1}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% C O M A N D O   P A R A   S U B . S U B . S U B . %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\subsubsubsection}[1]{
+    \paragraph{#1}
+}
+
+\newcommand{\subsubsubsubsection}[1]{
+    \subparagraph{#1}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% C A B E Ç A L H O   F A N C Y   C O M   P A G I N A %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\setheader}{
+    \pagestyle{fancy}
+    \lhead{\bfseries \imprimeheader}
+    \chead{}
+    \rhead{\textcolor[rgb]{0.50,0.00,0.00}{\textbf{\thepage}}}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% C A B E Ç A L H O   L I M P O %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\setheaderlimpo}{
+    \thispagestyle{empty}
+    \lhead{}
+    \chead{}
+    \rhead{}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% R O D A P É  C O M   C O N T E Ú D O  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\setfooter}{
+    \pagestyle{fancy}
+    \lfoot{\textcolor[rgb]{0.50,0.00,0.00}{\textbf{\imprimetitulo}}}
+    \cfoot{}
+    \rfoot{\textcolor[rgb]{0.50,0.00,0.00}{\textbf{\thepage}}}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+% R O D A P É  L I M P O %
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\setfooterlimpo}{
+    \pagestyle{fancy}
+    \lfoot{}
+    \cfoot{}
+    \rfoot{}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  S U B S T I T U I N D O   C O N S T A N T E S %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\titulo{@tópicos-em-arquiteturas-paralelas} \subtitulo{Mestrado em Informática - UFPR}
+\autor{Diogo Cezar Teixera Batista \\ Daniel Weingaertner} \local{Curitiba}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% C A B E Ç A L H O   D O   P R O J E T O %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\header{
+    \textcolor[rgb]{0.50,0.00,0.00}{\textbf{\imprimetitulo}}
+    \vspace{0.1cm}
+    \newline
+    {\scriptsize \imprimeautor}
+    \newline
+    {\scriptsize \today}
+    \vspace{0.1cm}
+}
+
+\setfooterlimpo
+\setheaderlimpo
+
+\begin{document}
+
+%%%%%%%%%%%
+% C A P A %
+%%%%%%%%%%%
+
+    \setfooter
+    \setheader
+
+    \begin{flushright}
+    \end{flushright}
+
+    \vspace{3cm}
+
+    \begin{center}
+    {\Huge \textbf{\textcolor[rgb]{0.50,0.00,0.00}{\imprimetitulo}}}
+
+    \vspace{3cm}
+
+    {\huge \textbf{\imprimesubtitulo}}
+
+    \vspace{3cm}
+
+    {\Large \imprimeautor}
+
+    \vspace{3cm}
+
+    \imprimelocal
+
+    \vspace{3cm}
+
+    \today
+
+    \vspace{2cm}
+
+    \end{center}
+
+    \newpage
+
+
+%%%%%%%%%%%%%%%%%
+% S U M Á R I O %
+%%%%%%%%%%%%%%%%%
+
+    \begin{flushright}
+    \end{flushright}
+
+    \setcounter{page}{2}
+
+    \setheader
+
+    \setfooterlimpo
+
+    %\tableofcontents
+
+    %\newpage
+
+    %\listoffigures
+
+    %\newpage
+
+    %\listoftables
+
+    %\newpage
+
+    %\lstlistoflistings
+
+    %\newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% D O C U M E N T O   P R I N C I P A L  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    \setfooter
+
+    \section{Informações da Disciplina}
+
+    \begin{itemize}
+        \item Nome: \emph{Tópicos em Arquiteturas Paralelas};
+        \item Código: \emph{CI 805};
+        \item Professor: \emph{Daniel Weingaertner};
+        \item Horários: \emph{3ª das 13:30 as 15:10 / 6ª das 13:30 as 15:10};
+        \item Método de Avaliação:
+        \begin{itemize}
+            \item 1 prova + 1 trabalho: média = $(P + 2T) ÷ 3$
+        \end{itemize}
+        \item Trabalho:
+        \begin{itemize}
+            \item Trabalho individual;
+            \item Implementação computacional;
+            \item Artigo de 6 páginas, inglês (preferencialmente) ou português.
+            \item Apresentação de 20min em inglês ou português.
+        \end{itemize}
+        \item Página da disciplina: http://www.inf.ufpr.br/danielw/grad/ci314/
+        \item Datas:
+        \begin{itemize}
+            \item Prova: 22 de junho;
+            \item Trabalho: 01 de junho;
+            \item Prova Final e Segunda Chamada: 06 de julho.
+        \end{itemize}
+    \end{itemize}
+
+    \newpage
+
+    \section{Multiprocessadores e Paralelismo a Nível de Thread}
+
+    \begin{itemize}
+        \item Por que computadores paralelos vieram para ficar?
+        \begin{itemize}
+            \item Limitação no tamanho dos componentes $\rightarrow$ latência, alimentação e dissipação;
+            \item Maior problema é dissipação.
+        \end{itemize}
+    \end{itemize}
+
+    \begin{itemize}
+        \item Limitação do paralelismo de instrução (ILP)
+        \begin{itemize}
+            \item ILP: divisão em sub-unidades funcionais independentes;
+            \item Maior trabalho feito pelos compiladores: reordenamento de instruções;
+            \item Referência: descrição e problemas $\rightarrow$ Patterson.
+        \end{itemize}
+    \end{itemize}
+
+    \begin{itemize}
+        \item Desde 1980 computadores paralelos de memória compartilhada
+        \begin{itemize}
+            \item Multithreading (Intel Hyperthread) permite execução intercalada de diversas threads, mantendo o pipeline de instruções cheio;
+            \item Multicore implementa processadores completos.
+        \end{itemize}
+    \end{itemize}
+
+    \begin{itemize}
+        \item Compiladores terão de aprender a lidar com essa realidade, mas o programador
+        terá que descrever os pontos de concorrência da sua aplicação;
+        \item Em 2005 Intel parou de desenvolver ILP para dedicar-se ao multicore,
+        seguindo IBM e Sun;
+    \end{itemize}
+
+    \begin{itemize}
+        \item Fatores que impulsionam multiprocessamento:
+        \begin{itemize}
+            \item Interesse crescente em performance de servidores (mainframe!?);
+            \item Programas que usam quantidades massivas de dados;
+            \item Compreensão de como usar multiprocessamento com efetividade, especialmente em servidores, que possuem paralelismo de threads intrínseco;
+            \item Redução de custo de design: replicação de um core mais simples.
+        \end{itemize}
+    \end{itemize}
+
+    \section{Taxonomia de Arquiteturas Paralelas de Memória Compartilhada}
+
+    \begin{itemize}
+        \item Single Instruction stream Single Data stream (SISD): uniprocessador;
+        \item Single Instruction stream Multiple Data streams (SIMD):
+        \begin{itemize}
+            \item Mesma instrução executada por multiplos processadores usando dados diferentes;
+            \item Exploram paralelismo de dados;
+            \item Cada processador tem seus próprios dados, mas há apenas uma memória de instruções;
+            \item Operações sobre multimídia (CUDA, SSE).
+        \end{itemize}
+        \item Multiple Instruction streams Multiple Data streams (MIMD):
+        \begin{itemize}
+            \item Cada processador tem seus próprios dados e instruções;
+            \item Explora o paralelismo em nível de Thread, uma vez que elas operam simultaneamente;
+            \item Mais flexível do que SIMD e por isso mais genéricamente aplicável;
+            \item Foco do início da disciplina (OpenMP).
+        \end{itemize}
+    \end{itemize}
+
+    \subsection{Processadores MIMD}
+
+    \begin{itemize}
+        \item São flexíveis: podem ser otimizados como multiprocessadores single-user para alta performance, multiprogramados, com diversas threads, ou uma combinação;
+        \item Vantajosos do ponto de vista de custo pois podem ser construídos a partir da combinação de processadores existentes;
+        \item Cada processador executa seu próprio conjunto de instruções. Eventualmente processos distintos ou threads distintas;
+        \begin{itemize}
+            \item Diferenciar processos de threads;
+            \item Conceito de thread para o processador pode significar qualquer um dos dois;
+        \end{itemize}
+        \item O programador precisa aprender a aproveitar o paralelismo a nível de threads;
+        \begin{itemize}
+            \item Quantas, quando iniciar, quando sincronizar;
+            \item Também pode ser utilizado para explorar paralelismo a nível de dados, entretanto há um overhead que pode tornar proibitivo (comparado a SIMD);
+        \end{itemize}
+    \end{itemize}
+
+    \subsection{Divisão dos MIMD quanto ao tipo de memória}
+
+    \begin{itemize}
+        \item Arquiteturas de memória compartilhada centralizada;
+        \begin{itemize}
+            \item Symmetric (shared-memory) multiprocessors (SMPs);
+            \item Uniform Memory Access (UMA): acesso à mesma latência;
+            \item Para atender à demanda de memória com poucos cores: cache grande, uma memória em múltiplos bancos;
+            \item Aumentando o número de cores (algumas dezenas): aumentar número de bancos de memória, usar conexões p2p ou switch;
+            \item É a arquitetura mais utilizada.
+        \end{itemize}
+    \end{itemize}
+
+    \begin{itemize}
+        \item Arquiteturas de memória distribuída;
+        \begin{itemize}
+            \item Permite maior número de processadores. No modelo centralizado o barramento da memória não suportaria a demanda. Alta latência;
+            \item Quanto maior a velocidade dos processadores, menor o número que pode compartilhar barramento;
+            \item Necessita de uma interconexão de alta velocidade, tipicamente switches ou redes mesh multidimensionais;
+            \item Vantagens: baixo custo para alta banda de acesso, uma vez que a maioria dos acessos ocorre na mem. local. Redução da latência.
+            \item Desvantagem: comunicação entre processos mais complexa e aproveitamento da maior banda de memória exige esforço do software PROGRAMADOR;
+        \end{itemize}
+    \end{itemize}
+
+    \subsection{Modelos de Comunicação e Arquitetura de Memória}
+
+    Como compartilhar dados em sistemas de memória distribuída.
+
+    \begin{itemize}
+        \item Compartilhamento do espaço de endereçamento (Distributed Shared-Memory DSM);
+        \begin{itemize}
+            \item Todos processadores tem acesso ao mesmo espaço de endereçamento, embora os espaços estejam fisicamente em locais diferentes;
+            \item Shared-Memory refere-se ao espaço de endereçamento, não a uma única memória;
+            \item Non-Uniform Memory Access (NUMA): tempo de acesso depende da distância entre banco de memória e processador;
+            \item Compartilhamento de dados é transparente/implícito através de operações de load/store;
+        \end{itemize}
+    \end{itemize}
+
+    \begin{itemize}
+        \item Espaços de endereçamento distintos;
+        \begin{itemize}
+            \item Cada processador tem seu espaço em sua memória;
+            \item Comunicação deve ser feita explicitamente através de mecanismo;
+            \item Exemplo: Clusters;
+        \end{itemize}
+    \end{itemize}
+
+    \begin{itemize}
+        \item Memória Cache em Processadores SMP;
+        \begin{itemize}
+            \item Não é compartilhada;
+            \item Problema da "inconsistência de memória";
+            \item Necessidade de mecanismo de "coerência de cache"
+            \begin{itemize}
+                \item Fora do controle do programador, mas este deve saber fazer bom uso;
+                \item Exemplo 1: Snooping: cada processador tem o bloco e monitora o barramento;
+                \item Exemplo 2: Directory: status de cada bloco é mantido centralizado;
+            \end{itemize}
+            \item Infos em Patterson;
+            \item Sistemas que implementam coerência de forma transparente são chamados de "cache coherent";
+            \item OpenMP abstrai implementações físicas pois tem seu próprio modelo de memória, com dados privados e compartilhados (private, shared), e especifica quando há garantia de que um dado compartilhado está disponível.
+        \end{itemize}
+    \end{itemize}
+
+    \begin{itemize}
+        \item Programando SMPs;
+        \begin{itemize}
+            \item Compiladores são projetados para fazer o melhor uso do ILP, mas não funciona para multicore, pois é difícil definir trechos de código/dados independentes e o compilador também não pode mudar o algoritmo para deixálo paralelizável;
+        \end{itemize}
+    \end{itemize}
+
+    \section{OpenMP}
+
+    \begin{itemize}
+        \item O que é OpenMP;
+        \begin{itemize}
+            \item Interface de programação (API) para aplicações de memória compartilhada que facilita a programação paralela;
+            \item Não é uma linguagem de programação: extensão da linguagem C/C++, FORTRAN;
+            \item Possui diretivas que indicam como o trabalho será dividido entre threads e a ordem de acesso aos dados compartilhados;
+            \item Tornou-se um padrão de fato:
+            \begin{itemize}
+                \item Ênfase em programação estruturada;
+                \item Simplicidade de uso;
+                \item Permite paralelização incremental de código existente;
+                \item É apoiado pelos principais fabricantes de SMPs.
+            \end{itemize}
+        \end{itemize}
+    \end{itemize}
+
+    \begin{itemize}
+        \item Como programar com OpenMP;
+        \begin{itemize}
+            \item As "diretivas" OpenMP dizem ao compilador quais instruções devem ser executadas em paralelo e como distribuí-las ao longo das threads;
+
+            \item Como transformar um programa sequencial em um programa paralelo:
+            \begin{itemize}
+                \item 1° passo: Identificar o paralelismo. Pode requerer reorganização do código;
+                \item 2° passo: Implementar no código o paralelismo identificado;
+                \item Entretanto: ganhos significativos de performance geralmente demandam que o programador "suje as mãos" e desenvolva algoritmos paralelos;
+            \end{itemize}
+        \end{itemize}
+    \end{itemize}
+
+    \paragraph*{Comparação de diferentes APIs}
+
+    \texttt{\lstinputlisting[language=C, label=cod:cinoapis,
+    caption={Comparação de diferentes APIs}]{cods/aula03.c}}
+
+    \begin{itemize}
+        \item A idéia básica de OpenMP;
+        \begin{itemize}
+            \item Modelo de execução;
+            \item Uma thread é uma entidade de tempo de execução capaz de executar uma sequencia de instruções de maneira independente:
+            \begin{itemize}
+                \item compartilham espaço de endereçamento do processo;
+                \item possuem área privada de memória (registradores e pilha);
+                \item Program Counter individual;
+                \item Podem ser executadas concorrentemente num único processador (troca de contexto $\rightarrow$ multithreading)
+            \end{itemize}
+        \end{itemize}
+    \end{itemize}
+
+    \begin{itemize}
+        \item Modelo Fork and Join;
+        \begin{itemize}
+            \item Ruud, slides 13-15;
+            \item Quando um bloco "parallel" é encontrado por uma thread, ela cria um novo time de threads (FORK) e torna-se master do time;
+            \item Ao final da execução do bloco, apenas a thread master continua;
+        \end{itemize}
+    \end{itemize}
+
+    \begin{itemize}
+        \item OpenMP possibilita:
+        \begin{itemize}
+            \item Criação de time de threads para execução paralela;
+            \item Especificação de como dividir o trabalho entre as threads;
+            \item Declaração de variáveis privadas e compartilhadas;
+            \item Sincronização de threads e realização de operações exclusivas;
+        \end{itemize}
+    \end{itemize}
+
+    \begin{itemize}
+        \item Criação de threads
+        \begin{itemize}
+            \item Ocorre ao encontrar um bloco "parallel";
+            \item Ruud, slides 14-15;
+            \item Fim do bloco implica em barreira para todas as threads;
+            \item Blocos encadeados de "parallel": cada thread vira master;
+        \end{itemize}
+    \end{itemize}
+
+    \begin{itemize}
+        \item Divisão de trabalho entre threads
+        \begin{itemize}
+            \item Apenas a criação do bloco paralelo não divide o trabalho, apenas faz com que todas threads executem mesma tarefa;
+            \item Divisão de um laço FOR: mais comum;
+            \begin{itemize}
+                \item Atribui uma ou mais iterações a cada thread;
+                \item Estratégia mais direta: atribui "chunks" consecutivos a cada thread *** diferenciar thread, chunk ***;
+            \end{itemize}
+            \item Para laço ser paralelizável:
+            \begin{itemize}
+                \item Atribui uma ou mais iterações a cada thread;
+                \item Estratégia mais direta: atribui "chunks" consecutivos a cada thread *** diferenciar thread, chunk ***;
+            \end{itemize}
+            \item Blocos encadeados de "parallel": cada thread vira master;
+        \end{itemize}
+    \end{itemize}
+
+    \begin{itemize}
+        \item Para laço ser paralelizável:
+        \begin{itemize}
+            \item Número de iterações deve ser conhecido antes e não pode mudar;
+            \item Iterações devem ser independentes;
+            \item Dependência de dados impede paralelismo quando o valor que é escrito em uma iteração é lido ou sobrescrito em outra;
+        \end{itemize}
+        \item Divisão por pedaços de código;
+        \item Pode-se especificar que numa região paralela apenas uma thread execute um trecho de código.
+    \end{itemize}
+
+    \paragraph*{Modelo de memória}
+
+    \begin{itemize}
+        \item Ruud, slide 11-12;
+        \item Dados privados ou compartilhados para uma determinada região; \\ ** dados privados são mais rápidos, evitam lock e ajudam em cc-NUMA **
+        \item Tamanho da pilha pode ser insuficiente;
+        \item Dados compartilhados são coerentes em determinados pontos de sincronização, ou seja, temporariamente podem ser != (cache) Ruud, slide 18;
+    \end{itemize}
+
+    \paragraph*{Sincronização de Threads}
+
+    \begin{itemize}
+        \item Final de região paralela: sincronização implícita;
+        \item Apenas uma thread executa determinado código;
+        \begin{itemize}
+            \item Enquanto esperam, threads podem executar outros trechos;
+        \end{itemize}
+        \item Atualização atômica de variáveis em mem. compartilhada;
+        \item Sincronização de subconjunto de threads: não suportada, manual;
+        \item operação flush sincroniza dado compartilhado;
+        \item Evitar dead-lock e acesso simultâneo a dados compartilhados (data race) é função do programador;
+        \begin{itemize}
+            \item Data race é difícil de detectar, pois pode não ser reprodutível: depende da ordem de execução das threads;
+        \end{itemize}
+        \item Verificar se número de threads é o esperado, pois limitação nos recursos pode diminuir o número e quebrar o código.
+    \end{itemize}
+
+    \paragraph*{Outras características}
+
+    \begin{itemize}
+        \item Controle do número de threads: via var. de ambiente, durante execução ou antes de entrar na região paralela;
+        \begin{itemize}
+            \item permite variação dinâmica do núm. de threads;
+            \item uma vez iniciada uma região paralela, num de threads não muda.
+        \end{itemize}
+        \item Atualização atômica de variáveis em mem. compartilhada;
+        \item Sincronização de subconjunto de threads: não suportada, manual;
+        \item operação flush sincroniza dado compartilhado;
+        \item Evitar dead-lock e acesso simultâneo a dados compartilhados (data race) é função do programador;
+        \begin{itemize}
+            \item Data race é difícil de detectar, pois pode não ser reprodutível: depende da ordem de execução das threads;
+        \end{itemize}
+        \item Verificar se número de threads é o esperado, pois limitação nos recursos pode diminuir o número e quebrar o código.
+    \end{itemize}
+
+
+   \section{Escrevendo código em OpenMP}
+
+   \paragraph*{Sintaxe}
+
+    \begin{itemize}
+        \item Diretivas iniciam com '\#pragma omp';
+        \item case sensitive;
+        \item aceitam espaços entre as palavras;
+        \item quebras de linha devem conter '\';
+        \item Não há mensagem nem warning para erros de grafia (Utilizar '-Wall');
+    \end{itemize}
+
+    \texttt{\lstinputlisting[language=C, label=cod:cinoapis,
+    caption={Comparação de diferentes APIs}]{cods/aula04.c}}
+
+    \paragraph*{Análise do código de aula04.c}
+
+    \begin{itemize}
+        \item palavra-chave 'restrict': C99;
+        \item garante acesso apenas através deste ponteiro para aquela região de memória;
+        \item permite otimizações por parte do compilador;
+    \end{itemize}
+
+    \paragraph*{Compilando código}
+
+    \begin{itemize}
+        \item gcc -o <programa> -fopenmp -std=gnu99 <arq.c>;
+    \end{itemize}
+
+    \paragraph*{Principais Diretivas de OpenMP}
+
+    \begin{itemize}
+        \item Construção 'parallel';
+        \item Construções de divisão de trabalho;
+        \begin{itemize}
+            \item loop;
+            \item section;
+            \item single;
+        \end{itemize}
+        \item Cláusulas de compartilhamento de dados, 'no wait' e escalonamento;
+    \end{itemize}
+
+    \subsection{Construção Parallel}
+
+    \begin{verbatim}
+    #pragma omp parallel [clause, clause, ...]
+    bloco estruturado}
+    \end{verbatim}
+
+    \begin{itemize}
+        \item A partir desta construção é criado o time de threads;
+        \item Inicia a execução paralela, mas não distribui o trabalho da região;
+        \item Entre as threads. Cabe ao programador definir a divisão de trabalho;
+        \item A thread que encontra uma região 'parallel' vira master do novo time;
+        \item O ID dos threads varia de 0 (master) a n-1
+    \end{itemize}
+
+
+    \texttt{\lstinputlisting[language=C, label=cod:cinoapis,
+    caption={Construção Parallel}]{cods/parallel.txt}}
+
+    \paragraph*{Cláusulas suportadas}
+
+    \begin{itemize}
+        \item if(scalar-expression)
+        \item num threads(integer-expression)
+        \item private(list)
+        \item firstprivate(list)
+        \item shared(list)
+        \item default(none|shared)
+        \item copyin(list)
+        \item reduction(operator:list)
+    \end{itemize}
+
+     \paragraph*{Restrições}
+
+    \begin{itemize}
+        \item Não pode haver saltos para dentro ou para fora de uma região paralela
+        \item O programa não pode depender da ordem das cláusulas
+        \item Apenas uma cláusula 'if'
+        \item Apenas uma cláusula 'num\_threads'
+    \end{itemize}
+
+    \paragraph*{Construções de Divisão de Trabalho}
+
+    \begin{itemize}
+        \item dividem a computação entre as threads
+        \item devem estar em uma região paralela ativa, senão são ignoradas (ex. Função)
+        \item Regras:
+        \begin{itemize}
+            \item Cada construção deve ser atingida por TODAS as threads ou por NENHUMA
+            \item A sequência de regiões de divisão de trabalho e barreiras deve ser a mesma para todas as threads de um time.
+        \end{itemize}
+        \item Não constrói threads e não tem barreira de entrada. Por default barreira na saída.
+    \end{itemize}
+
+    \paragraph*{Construção Loop}
+
+    \begin{verbatim}
+    #pragma omp for [clause, clause, ...]
+    laço for
+    \end{verbatim}
+
+    \begin{itemize}
+        \item Limitado a laços com número de execuções conhecido, construção com apenas uma variável de controle:
+        \begin{verbatim}
+        for (init-expr; var relop b; incr-expr)
+        \end{verbatim}
+        \item Cláusulas suportadas:
+        \begin{itemize}
+            \item private(list)
+            \item firstprivate(list)
+            \item lastprivate(list)
+            \item ordered
+            \item schedule(kind[,chunk\_size])
+            \item reduction(operator:list)
+            \item nowait
+        \end{itemize}
+        \item Dois laços consecutivos: todos esperam na barreira (excessão:nowait)
+    \end{itemize}
+
+
+    \paragraph*{Construção Sections}
+
+    \texttt{\lstinputlisting[language=C, label=cod:cinoapis,
+    caption={Construção Section}]{cods/section.txt}}
+
+    \begin{itemize}
+        \item Cada thread executa um trecho diferente de código;
+        \item Cada seção deve ter um bloco de código independete das outras;
+        \item Cada bloco é executado apenas uma vez, e cada thread executa apenas um bloco por vez;
+        \item Não há ordem de execução;
+        \item Problemas:
+        \begin{itemize}
+            \item Mais threads que blocos;
+            \item Balancemento de carga;
+        \end{itemize}
+        \item Dois laços consecutivos: todos esperam na barreira (excessão:nowait)
+    \end{itemize}
+
+    \texttt{\lstinputlisting[language=C, label=cod:cinoapis,
+    caption={Exemplo de utilização das sections}]{cods/ex-sections.txt}}
+
+    \paragraph*{Construção Single}
+
+    \begin{verbatim}
+    #pragma omp single [clause, ...]
+    structured block
+    \end{verbatim}
+
+    \texttt{\lstinputlisting[language=C, label=cod:cinoapis,
+    caption={Construção Single}]{cods/single.txt}}
+
+    \begin{itemize}
+        \item Possui barreira automática;
+        \item Por que não deixar todas as threads escreverem o valor da variável?
+        \begin{itemize}
+            \item Escrita não é atômica: resultado imprevisível;
+            \item Problema de performance;
+        \end{itemize}
+    \end{itemize}
+
+    \paragraph*{Possível combinar 'parallel' com 'for' ou 'section'}
+
+    \begin{itemize}
+        \item Cláusulas de controle das construções de Divisão de Trabalho:
+        \begin{itemize}
+            \item São processadas ANTES de entrar na região paralela. São externas;
+            \item \emph{shared}
+            \begin{itemize}
+                \item Cuidar com uso simultâneo;
+                \item Cuidar com tamanho do cache;
+            \end{itemize}
+            \item \emph{private}
+            \begin{itemize}
+                \item Valor indefinido na entrada e depois da saída da região paralela;
+            \end{itemize}
+            \item \emph{lastprivate}
+            \begin{itemize}
+                \item Última thread na sequencia atualiza variável fora do bloco:
+                \begin{itemize}
+                    \item No caso de laço: último pedaço (thread depende do schedule);
+                    \item No caso de section: última a aparecer no código;
+                    \item Exemplo no código \ref{cod:lastp};
+                    \item Poderia ser substituído por um if e uma variável shared;
+                    \item Há aumento de custo em qualquer caso para determinar qual thread deve efetuar a cópia. (schedule)
+                \end{itemize}
+            \item \emph{firstprivate}
+                \begin{itemize}
+                    \item inicializa o valor de todos elementos da thread;
+                    \item geralmente, variáveis read-only podem ser shared;
+                    \item no caso de cc-NUMA, melhor firstprivate!;
+                \end{itemize}
+            \item \emph{default}
+                \begin{itemize}
+                    \item define o padrão a ser utilizado;
+                \end{itemize}
+            \item \emph{nowait}
+                \begin{itemize}
+                    \item Retira a barreira ao final de uma região de divisão de trabalho
+                    \item Barreiras ao fim de regiões paralelas não podem ser removidas
+                    \item CUIDADO: race conditions!
+                \end{itemize}
+            \end{itemize}
+        \end{itemize}
+    \end{itemize}
+
+    \texttt{\lstinputlisting[language=C, label=cod:lastp,
+    caption={Construção Single}]{cods/lastp.txt}}
+
+    \paragraph*{EXERCÍCIO:} Cada thread em uma região paralela precisa acessar uma seção específica de um vetor, mas o acesso inicia a partir de um offset (!= 0). Seja 'a' o vetor, 'indx' o offset, 'n' o tamanho do chunk
+
+    \texttt{\lstinputlisting[language=C, label=cod:lastp,
+    caption={Exercício}]{cods/exercicio.txt}}
+
+    \subsection{Cláusulas de sincronismo}
+
+    \begin{itemize}
+        \item \texttt{void omp\_FUNC\_lock(omp\_lock\_t *lck)};
+        \item Similar a semáforos;
+        \item FUNC pode ser: init, destroy, set, unset, test;
+        \item Modo de uso:
+        \begin{enumerate}
+            \item Declarar variáveis de lock;
+            \item Inicializar o lock com omp\_init\_lock;
+            \item Atribuir o lock com omp\_set\_lock ou omp\_test\_lock;
+            \item Liberar lock após trabalho completo com omp\_unset\_lock.
+        \end{enumerate}
+        \item Cuidado com dead-lock;
+    \end{itemize}
+
+    \texttt{\lstinputlisting[language=C, label=cod:lastp,
+    caption={Utilização do Lock}]{cods/lock.txt}}
+
+    \subsection{Master}
+
+    \begin{verbatim}
+        #pragma omp master
+        { bloco estruturado }
+    \end{verbatim}
+
+    \begin{itemize}
+        \item Garante execução pela thread master, em contraposição a single, em que qualquer uma pode executar;
+        \item Não há barreira implícita de sincronismo.
+    \end{itemize}
+
+    \subsection{Controle do ambiente de execução}
+
+    Segue-se a seguinte prioridade para definição do número de threads:
+
+    \begin{verbatim}
+    OMP_NUM_THREADS < omp_set_num_threads() < threads() in Parallel
+    \end{verbatim}
+
+    \texttt{\lstinputlisting[language=C, label=cod:lastp,
+    caption={Definindo número de threads}]{cods/num_threads.txt}}
+
+    Comandos:
+
+    \begin{itemize}
+        \item omp\_get\_num\_threads;
+        \item omp\_get\_thread\_num;
+        \item omp\_get\_num\_procs;
+        \item omp\_in\_parallel.
+    \end{itemize}
+
+    \subsection{Cláusula Reduce}
+
+    \begin{itemize}
+        \item reduction(operator:list);
+    \end{itemize}
+
+    \texttt{\lstinputlisting[language=C, label=cod:lastp,
+    caption={Exemplo Redução}]{cods/aula07-reduction.c}}
+
+    \subsection{Paralelismo Encadeado}
+
+    No paralelismo encadeado cada thread que irá formar um novo time com $n$ novas threads assume a nova sequencia como master, ou seja, seu novo $ID = -$.
+
+    \texttt{\lstinputlisting[language=C, label=cod:lastp,
+    caption={Exemplo Paralelismo Encadeado}]{cods/encadeamento.txt}}
+
+    \begin{itemize}
+        \item Cuidado com omp\_get\_thread\_num(): retorna 0--N-1, onde N é o time;
+    \end{itemize}
+
+    \subsection{Flush}
+
+    \begin{verbatim}
+    #pragma omp flush [lista]
+    \end{verbatim}
+
+    \begin{itemize}
+        \item Modelo de consistência relaxada: permite valores temporários para cada thread;
+        \item Garantia de valor único somente em pontos de sincronismo;
+        \item Diretiva flush atualiza memória global (lista) com valores da thread;
+        \item Se T modificou var, valor vai p/ memória global. Senão, var é atualizado com valor da mem. global;
+        \item FLUSH implicitos em: barreiras, I/O de regiões críticas e lock.
+    \end{itemize}
+
+    \newpage
+
+    \section{Introdução ao modelo de Programação CUDA}
+
+
+    CUDA é um modelo de programação paralela escalável e um ambiente de software para a computação paralela.
+
+    \begin{itemize}
+        \item Acesso ao Hardware das GPUs através de extensões mínimas da linguagem C/C++;
+        \item Programação Heterogênea (CPU + GPU);
+    \end{itemize}
+
+
+    \subsection{Modelo de programação CUDA (Execução + Memória)}
+
+    CUDA foi desenvolvido para centenas de núcleos de processamento e milhares de threads paralelas.
+
+    \paragraph*{Definições:}
+    \begin{itemize}
+        \item Kernel = função que executa na GPU;
+        \item Device = GPU;
+        \item Host = CPU;
+   \end{itemize}
+
+    \paragraph*{Porções paralelas de uma aplicação executam na GPU como Kernels}
+    \begin{itemize}
+        \item Imagem (Guia de Programação, pág 21);
+        \item Um Kernel por vez;
+        \item Muitas threads por Kernel;
+   \end{itemize}
+
+    \paragraph*{Diferenças entre threads CUDA e CPU}
+    \begin{itemize}
+        \item Threads CUDA são extremamente leves;
+        \item CUDA usa de milhares de threads para executar de forma eficiente, enquanto as CPUs multicore podem utilizar apenas algumas threads;
+    \end{itemize}
+
+    \begin{itemize}
+        \item Um Kernel CUDA é executado por um array multidimensional de threads:
+        \begin{itemize}
+            \item Exemplo (Getting Started witk CUDA, pág 6);
+            \item Cada thread possui uma identificação que é usada para computar endereços de memória e tomar decisões de controle;
+        \end{itemize}
+        \item Cooperação de threads:
+        \begin{itemize}
+            \item Compartilhar resultados evita computação desnecessária;
+            \item Compartilhar acessos a memória reduz drasticamente a nececessidade de acessos a memória global;
+        \end{itemize}
+        \item Hierarquia/Organização de Threads:
+        \begin{itemize}
+            \item Imagem (Getting Started with CUDA, pág 8);
+            \item Um Kernel lança um grid de blocos de threads;
+            \item Threads em um bloco cooperam memória compartilhada;
+            \item Threads em um bloco podem sincronizar;
+        \end{itemize}
+        \item Escalabilidade em CUDA:
+         \begin{itemize}
+            \item Imagem (Guia de Programação, pág 78);
+            \item CUDA permite que programas escalem transparentemente em diferentes GPUs;
+            \item O HW é livre para escalonar os blocos de threads em qualquer;
+            \item Dispositivos podem executar menos ou mais blocos por vez dependendo da arquitetura;
+        \end{itemize}
+        \item Arquitetura das GPUs:
+         \begin{itemize}
+            \item Série 8 (G80):
+            \begin{itemize}
+                \item Imagem (Getting Started with CUDA, pág 10);
+                \item 128 processadores (executam threads);
+                \item 16 multiprocessadores com 8 processadores e 1 memória compartilhada cada;
+            \end{itemize}
+            \item Série 10:
+            \begin{itemize}
+                \item Imagem (Getting Started with CUDA, pág 11);
+                \item 240 processadores (executam threads);
+                \item 30 multiprocessadores com 8 processadores, 1 memória compartilhada e 1 unidade de dupla precisão cada;
+            \end{itemize}
+        \end{itemize}
+        \item Modelo de Memória:
+        \begin{itemize}
+            \item Imagem (Getting Started with CUDA, pág 12);
+        \end{itemize}
+        \item Disposição Física da Memória:
+        \begin{itemize}
+            \item Imagem (Guia de Programação, pág 80);
+            \item A memória Local o é no sentido de acesso de cada thread, na verdade é uma abstração da memória global;
+            \item A única memória do Device que a CPU pode acessar é a Global;
+        \end{itemize}
+        \item Modelo de Execução:
+        \begin{itemize}
+            \item Imagem (Getting Started with CUDA, pág 14);
+            \item Threads são executadas nos processadores;
+            \item Blocos são executados nos multiprocessadores;
+            \item Blocos não migram (executam até o fim no mesmo multiprocessador);
+            \item Podem residir em um multiprocessador quantas threads forem permitidas limitado pelos recursos de hardware do multiprocessador (memória compartilhada,registradores);
+            \item Kernel é lançado como um grid de blocos de threads;
+            \item Apenas um Kernel pode executar por vez na GPU;
+        \end{itemize}
+    \end{itemize}
+
+    \subsection{Gerenciamento de Memória}
+
+    \verb|cudaMalloc(void** pointer, size_t nbytes)|
+
+    \begin{itemize}
+        \item Aloca um ponteiro em GPU;
+        \item pointer deve ser alocado previamente em CPU.
+    \end{itemize}
+
+    \verb|cudaMemset(void* pointer, int value, size_t nbytes)|
+
+    \begin{itemize}
+        \item Preenche os primeitos nbytes do endereço de memória com o value.
+    \end{itemize}
+
+    \verb|cudaFree(void* pointer)|
+
+    \begin{itemize}
+        \item Libera o ponteiro em GPU.
+    \end{itemize}
+
+    \verb|cudaMemcpy(void* dst, void* src, size_t nbytes, enum cudaMemcpyKind direction)|
+    \begin{itemize}
+        \item copia os nbytes de src para dst;
+        \item direction indica a direção da transferência:
+        \begin{itemize}
+            \item \verb|cudaMemcpyHostToDevice|
+            \item \verb|cudaMemcpyDeviceToHost|
+            \item \verb|cudaMemcpyDeviceToDevice|
+        \end{itemize}
+        \item Exemplo de gerenciamento de memória (Getting Started, pág 25).
+    \end{itemize}
+
+    \subsection{Executando Código em GPU}
+
+    Kernels são funções em C com restrições
+
+    \begin{itemize}
+        \item Não podem acessar memória do Host;
+        \item Deve retornar void;
+        \item O número de argumentos não pode ser variável (é fixo);
+        \item Não possui recursão;
+        \item Não possui variáveis estáticas.
+    \end{itemize}
+
+    Os argumentos são automaticamente transferidos para a memória da GPU.
+
+    As funções podem ser qualificadas em:
+
+    \begin{itemize}
+        \item \verb|__global__| : chamada pelo Host e executada pelo Device;
+        \item \verb|__device__| : chamada pelo Device e executada pelo Device;
+        \item \verb|__host__| : chamada pelo Host e executada pelo Host.
+    \end{itemize}
+
+    Pode ser combinada com o qualificador \verb|__device__| para gerar uma função que pode executar tanto em CPU e quanto em GPU.
+
+    Lançando Kernels: \verb|kernel<<<dG, dB>>>(...)|
+
+    \begin{itemize}
+        \item dim3 dG: dimensões do Grid;
+        \item dim3 dB: dimensões do Bloco.
+    \end{itemize}
+
+    Variáveis Pré-definidas:
+
+    \begin{itemize}
+        \item dim3 gridDim
+        \item dim3 blockDim
+        \item dim3 blockIdx
+        \item dim3 threadIdx
+    \end{itemize}
+
+    Identificadores de Threads: Imagem (Getting Started, pág 40)
+
+    Exemplo de Código: Imagem (Getting Started, pág 42)
+
+    Tipos vetoriais pré-definidos:
+
+    \begin{itemize}
+        \item [u]char[1..4]
+        \item [u]short[1..4]
+        \item [u]int[1..4]
+        \item [u]long[1..4]
+        \item float[1..4]
+        \item double[1..2]
+        \item dim3
+    \end{itemize}
+
+    Qualificadores de Variáveis:
+
+    \verb|__device__|: indica que a variável em questão será alocada na memória global.
+
+    Variáveis alocadas com cudaMalloc() possuem este qualificador implicitamente.
+
+    \verb|__shared__|: indica que a variável em questão será alocada na memória compartilhada.
+   
+    É acessível por todas as threads no mesmo bloco onde ela foi criada.
+    
+    Variáveis não qualificadas:
+    
+    \begin{itemize}
+        \item Escalares e tipos vetoriais pré-definidos são alocados nos registradores.
+        \item O que não couber nos registradores é alocado na memória local.
+    \end{itemize}
+
+\subsection{Memória Compartilhada}
+    \begin{itemize}
+        \item Todos os Kernels são assíncronos:
+        \begin{itemize}
+            \item O controle volta imediatamente para a CPU assim que um kernel é lançado;
+            \item cudaMemcpy é síncrono;
+            \item O controle volta para a CPU após a cópia terminar;
+            \item cudaThreadSynchonize() bloqueia (espera) até que todas as chamadas CUDA terminem.
+        \end{itemize}
+        \item Exemplo (Getting Started, pág 44).
+    \end{itemize}    
+\end{document}

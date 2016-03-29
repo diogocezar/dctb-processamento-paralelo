@@ -1,0 +1,8 @@
+proc_j, 0 <= j < p, write 0 into R[j]
+for k := 1 to (p-1), proc_j, 0 <= j < p do
+	l := (j+k) MOD p
+	if M[l] < M[j] or (M[l] = M[j] and l < j) then
+		A[j] := A[j] + 1;
+	endif
+endfor
+proc_j, 0 <= j < p write M[j] into M[A[j]]

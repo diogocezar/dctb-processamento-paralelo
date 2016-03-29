@@ -1,0 +1,52 @@
+Informações úteis sobre um kernel
+=================================
+
+- Para gerar um arquivo .cubin (que contém a quantidade de memória
+local/compartilhada utilizada) utilize o seguinte argumento do nvcc: -cubin
+
+- Para imprimir essas informações após a compilação utilize: --ptxas-options=-v
+
+- Para manter os arquivos dtemporários de compilação: -keep
+
+
+CUDA Visual Profiler
+====================
+
+Instalando:
+-----------
+
+- Instalar cuda Toolkit 2.2 (ou mais novo)
+  + Use a versão 64 bits nas máquinas do lspad
+- Atribuir as seguintes variáveis de ambiente:
+
+PATH=$PATH:<cuda_dir>/cudaprof/bin
+LD_LIBRARY_PATH=$LD_LIBRARY_PATH:<cuda_dir>/cudaprof/bin
+
+  + <cuda_dir> representa o diretório onde o toolkit está instalado.
+  + Dica: Colocar a atribuição no .bashrc
+
+
+Utilizando:
+-----------
+
+- Abra um novo projeto usando a opção principal File->New ou a opção no toolbar.
+  Defina o nome do projeto e o diretório onde ele será salvo (arquivo .cpj).
+
+- Defina as configurações da Seção (Session settings):
+   Launch: Selecione o binário (executável) do seu programa
+   Working Directory: Diretório onde o seu programa será executado
+(modifique se necessário)
+   Argumentos: Se tiver argumentos coloque-os aqui
+(modifique se necessário)
+   Max. Execution Time: Aborta o programa se ultrapassar este tempo em segundos
+(modifique se necessário)
+
+- Execute o programa, pressionando Start ou através do toolbar. Se o programa
+for executado corretamente o resultado do profiler será mostrado.
+
+- O projeto pode ser salvo para ser analisado posteriormente.
+
+- Para abrir um projeto salvo anteriormente, selecione um arquivo .cpj através
+da opção File->Open ou através do toolbar.
+
+

@@ -1,0 +1,6 @@
+proc j, 1 <= j < n, do	
+	while not_empty_clause(c) do
+		c := resolve(c[j], search_denied_clauses(c[j]));
+		c := mark_resolved(c[j]);
+	endwhile
+end

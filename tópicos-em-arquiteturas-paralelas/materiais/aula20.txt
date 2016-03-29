@@ -1,0 +1,201 @@
+Otimização
+==========
+
+Linhas Gerais para Otimização:
+  - Otimizar Transferências de Memória
+  - Maximizar a Ocupação dos Processadores
+  - Maximizar a Intensidade Aritmética
+
+
+Otimizar Transferências de Memória
+==================================
+  - Minimizar transferências de memória entre as memórias da CPU e da GPU
+  - Usar a memória compartilhada como um cache para a memória global
+  - Tirar proveito dos acessos coalescentes
+
+    + Memória Global: Acessos Coalescentes
+    + Memória Compartilhada: Conflitos de Bancos
+
+Maximizar a ocupação do processador
+===================================
+  - Memória Compartilhada e Registradores como cache.
+  - Encobrir latência de acesso a memória com mais warps por bloco
+  - Maximizar a Ocupância dos Multiprocessadores (Blocos/Multiprocessadores)
+(CUDA_Ocupancy_calculator.xls)
+    + A Ocupância de cada multiprocessdor é definida pela quantidade de warps
+    ativos dividido pelo máximo de warps por multiprocessador
+    + A Ocupância é limitada fisicamente pelos recursos da GPU (registradores e
+    memória compartilhada)
+    + Permitir mais de um bloco utilizando a mesma Memória Compartilhada
+
+*Pode ser encontrado em:
+http://developer.download.nvidia.com/compute/cuda/CUDA_Occupancy_calculator.xls
+Ou no diretório tools/ do NVIDIA CUDA SDK.
+
+Maximizar a intensidade aritmética
+==================================
+  - Mais computação por acesso de memória
+  - Recomputar pode ser mais rápido que acessar a memória
+
+Código Exemplo: cudaCanny (Sobel)
+==============
+
+  - Primeira Versão:
+
+__global__ void kernel_2DSobel(int *Magnitude, int* Direction, int2 size){
+//this is an elaborated kernel version that calculate the sobel-x, sobel-y, then
+//uses the calculated values to return to memory just the needed information.
+//That is, the magnitude and direction of the edge.
+
+  int2 g_i;
+  g_i.x = g_i.y = 0;
+  float dir;
+  int tmp_dir = 0;
+
+  //pixel index of this thread
+  int pixIdx = blockIdx.x * blockDim.x + threadIdx.x;
+
+  //output pixel index
+  int2 pos;
+  pos.y = (int)pixIdx/size.x;
+  pos.x = (int)pixIdx-(pos.y*size.x);
+
+
+  //the pixel must not be on vertical edges
+  if ((pixIdx < size.x*size.y) && (pos.x > 0) && (pos.x < size.x-1)){
+
+    g_i.x -= (tex1Dfetch(texRef,(pixIdx-1))<<1);
+    g_i.x += (tex1Dfetch(texRef,(pixIdx+1))<<1);
+    if (pos.y < size.y-1){
+      g_i.x -= tex1Dfetch(texRef,(pixIdx+size.x-1));
+      g_i.x += tex1Dfetch(texRef,(pixIdx+size.x+1));
+    }
+    if (pos.y > 0){
+      g_i.x -= tex1Dfetch(texRef,(pixIdx-size.x-1));
+      g_i.x += tex1Dfetch(texRef,(pixIdx-size.x+1));
+    }
+  }
+  if ((pixIdx < size.x*size.y) && ((pixIdx/size.x) > 0) && ((pixIdx/size.x) < size.y-1)){
+
+    g_i.y += (tex1Dfetch(texRef,(pixIdx-size.x))<<1);
+    g_i.y -= (tex1Dfetch(texRef,(pixIdx+size.x))<<1);
+    if (pos.x < size.x-1){
+      g_i.y += tex1Dfetch(texRef,(pixIdx-size.x-1));
+      g_i.y -= tex1Dfetch(texRef,(pixIdx+size.x-1));
+    }
+    if (pos.x > 0){
+      g_i.y += tex1Dfetch(texRef,(pixIdx-size.x+1));
+      g_i.y -= tex1Dfetch(texRef,(pixIdx+size.x+1));
+    }
+  }
+
+  Magnitude[pixIdx] = sqrtf((g_i.x*g_i.x) + (g_i.y*g_i.y));
+
+  if (g_i.x != 0){
+    dir = atan(__fdividef(g_i.y,g_i.x));
+    //transform radian to degrees (multiply for 180/pi)
+    dir *= 180/3.14159265;
+    dir += 90;
+    //rounded to dir degrees. compare with perpendicular directions
+    if((dir <= 22) || (dir > 157))
+      tmp_dir = 1;
+    else{
+      tmp_dir = ((int)__fdividef(((int)dir - 23), 45) + 2);
+    }
+
+  }
+  else{
+    if (g_i.y == 0) tmp_dir = 0;
+    else tmp_dir = 1;
+  }
+  Direction[pixIdx] = tmp_dir;
+
+}
+
+  - Versão Final:
+
+__global__ void kernel_2DSobel(uint *Magnitude, short2* Direction, int3 size){
+/// This is an less elaborated kernel version that calculate the sobel-x, sobel-y, 
+/// then uses the calculated values to return to memory just the needed information.
+/// That is, the magnitude and direction of the edge.
+/// It ignores completely the borders of the image becausa the border's pixels
+/// doesn't have all neighbors
+
+  int2 g_i;
+  g_i.x = g_i.y = 0;
+  int theta;
+  int4 diagonal;
+  int4 cross;
+
+  /// Pixel index of this thread
+  int pixIdx = blockIdx.x * blockDim.x + threadIdx.x;
+
+  /// Output pixel index
+  int2 pos;
+  pos.y = __fdividef(pixIdx,size.x);
+  pos.x = pixIdx-(pos.y*size.x);
+
+  ///Ignore the image borders
+  if ((pos.x) && ((size.x-1)-pos.x) && (pos.y) && ((size.y-1)-pos.y)){
+
+    /// Stores the neighbors of the pixel on variables, because they will be
+    /// readen more than one time.
+    diagonal.x = tex1Dfetch(texRef,(pixIdx-size.x-1));
+    diagonal.y = tex1Dfetch(texRef,(pixIdx-size.x+1));
+    diagonal.z = tex1Dfetch(texRef,(pixIdx+size.x-1));
+    diagonal.w = tex1Dfetch(texRef,(pixIdx+size.x+1));
+    cross.x = tex1Dfetch(texRef,(pixIdx-size.x));
+    cross.y = tex1Dfetch(texRef,(pixIdx+size.x));
+    cross.z = tex1Dfetch(texRef,(pixIdx-1));
+    cross.w = tex1Dfetch(texRef,(pixIdx+1));
+
+    /// SobelX
+    g_i.x -= (diagonal.x+cross.z+cross.z+diagonal.z);
+    g_i.x += (diagonal.y+cross.w+cross.w+diagonal.w);
+    
+    /// SobelY
+    g_i.y -= (diagonal.z+cross.y+cross.y+diagonal.w);
+    g_i.y += (diagonal.x+cross.x+cross.x+diagonal.y);
+    
+  }
+
+  Magnitude[pixIdx] = sqrtf((g_i.x*g_i.x) + (g_i.y*g_i.y));
+
+  /// Transform radian to degrees (multiply for 180/pi) to facilitate the
+  /// aproximation on an integer variable.
+  /// And sums 90 degrees to rotate the trigonometrical circle and eliminate the
+  /// negative values.
+  theta = (g_i.x != 0)*(int)(atanf(__fdividef(g_i.y,g_i.x))*__fdividef(180,M_PI)) + 90;
+
+  /// Put the values between 158 and 180 degrees on the [0,22] interval.
+  /// This way, all horizontal pixels will be in the interval of [0,22].
+  if (theta > 157) theta -= 158;
+
+  /// This calculation does this:
+  //  direction
+  //  interval  -> theta
+  //  [0,22]    ->   0
+  //  [23,67]   ->   1
+  //  [68,112]  ->   2
+  //  [113,157] ->   3
+  theta = ceilf(__fdividef(theta-22,45));
+
+  /// The pixel will compare it's value with it's perpendicular(90 degrees) 
+  /// neighbor's here it's used short2 because it is 32bit lenght (this is 
+  /// good to the store coalescence).
+  /// theta -> ( x, y)
+  ///   0   -> ( 0,-1)
+  ///   1   -> (-1,-1)
+  ///   2   -> ( 1, 0)
+  ///   3   -> ( 1,-1)
+  Direction[pixIdx] = make_short2(1-(theta == 0)-((theta == 1)<<1),(theta == 2)-1);
+
+}
+
+
+CUDA Profiler
+=============
+
+
+Fontes: NVIDIA CUDA Programming Guide
+        Performance Optimization (http://developer.nvidia.com/object/nvision08-advanced-cuda.html)

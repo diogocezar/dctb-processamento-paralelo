@@ -1,0 +1,9 @@
+proc p[i,j], 1 <= i,j <= n do
+	if A[i] > A[j] OR (A[i] = A[j] AND i<j) then
+		C[i] = 1;
+	else
+		C[i] = 0;
+	endif
+
+proc p[i,j], 1 <= i < n do
+	A[C[i]+1] = A[i];

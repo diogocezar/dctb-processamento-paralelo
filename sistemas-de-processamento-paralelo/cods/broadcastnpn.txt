@@ -1,0 +1,4 @@
+proc_j, 0 <= j < p, write into M[j];
+for k := 1 to (p-1), proc_j, 0 <= j < p do
+	read B[(j+k) mod p];
+endfor

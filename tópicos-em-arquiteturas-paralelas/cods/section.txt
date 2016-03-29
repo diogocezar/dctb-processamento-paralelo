@@ -1,0 +1,8 @@
+#pragma omp sections [clause, clause, ...]
+    {
+    [#pragma omp section ]
+        structured block
+    [#pragma omp section
+        structured block ]
+        ...
+}

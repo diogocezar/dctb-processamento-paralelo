@@ -1,0 +1,3 @@
+for k := 0 to [lg p] -1, proc_j, 0 <= j < p do
+	copy M[j] into M[j+(2^k)];
+endfor

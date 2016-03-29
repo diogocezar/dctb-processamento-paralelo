@@ -1,0 +1,166 @@
+aim-50-1 6-no-3
+
+1 = 5629
+
+Thread 1 tempo 242.625000s, filhos: 5629.
+O tempo de execução do algorítmo foi: 242.687500s.
+Thread vencedor: 1
+
+
+2 = 6843
+
+Thread 1 tempo 48.687500s, filhos: 2507.
+Thread 2 tempo 48.875000s, filhos: 4336.
+O tempo de execução do algorítmo foi: 48.875000s.
+Thread vencedor: 2
+
+4 = 5730
+
+Thread 3 tempo 30.437500s, filhos: 1407.
+Thread 1 tempo 30.562500s, filhos: 1191.
+Thread 4 tempo 30.562500s, filhos: 1608.
+Thread 2 tempo 30.500000s, filhos: 1524.
+O tempo de execução do algorítmo foi: 30.562500s.
+Thread vencedor: 3
+
+8 = 11781
+
+Thread 6 tempo 70.125000s, filhos: 1493.
+Thread 8 tempo 70.312500s, filhos: 1642.
+Thread 7 tempo 70.812500s, filhos: 1767.
+Thread 2 tempo 70.937500s, filhos: 1563.
+Thread 3 tempo 70.937500s, filhos: 1407.
+Thread 4 tempo 71.062500s, filhos: 1376.
+Thread 1 tempo 71.062500s, filhos: 1223.
+Thread 5 tempo 71.125000s, filhos: 1310.
+O tempo de execução do algorítmo foi: 71.125000s.
+Thread vencedor: 3
+
+16 = 13048
+
+Thread 14 tempo 54.937500s, filhos: 1045.
+Thread 16 tempo 55.125000s, filhos: 724.
+Thread 11 tempo 55.187500s, filhos: 832.
+Thread 4 tempo 55.250000s, filhos: 702.
+Thread 6 tempo 55.312500s, filhos: 939.
+Thread 15 tempo 55.312500s, filhos: 790.
+Thread 3 tempo 55.375000s, filhos: 767.
+Thread 5 tempo 55.375000s, filhos: 792.
+Thread 12 tempo 55.437500s, filhos: 839.
+Thread 1 tempo 55.500000s, filhos: 707.
+Thread 13 tempo 55.625000s, filhos: 786.
+Thread 10 tempo 55.687500s, filhos: 742.
+Thread 8 tempo 55.687500s, filhos: 801.
+Thread 7 tempo 55.750000s, filhos: 744.
+Thread 2 tempo 55.750000s, filhos: 860.
+Thread 9 tempo 55.750000s, filhos: 978.
+O tempo de execução do algorítmo foi: 55.750000s.
+Thread vencedor: 10
+
+32 = 26131
+
+Thread 13 tempo 91.000000s, filhos: 778.
+Thread 8 tempo 91.000000s, filhos: 792.
+Thread 21 tempo 91.250000s, filhos: 709.
+Thread 11 tempo 91.437500s, filhos: 832.
+Thread 24 tempo 91.500000s, filhos: 887.
+Thread 2 tempo 91.562500s, filhos: 856.
+Thread 26 tempo 91.750000s, filhos: 758.
+Thread 29 tempo 92.125000s, filhos: 754.
+Thread 16 tempo 92.125000s, filhos: 724.
+Thread 6 tempo 92.187500s, filhos: 939.
+Thread 28 tempo 92.250000s, filhos: 1013.
+Thread 27 tempo 92.250000s, filhos: 725.
+Thread 22 tempo 92.250000s, filhos: 1114.
+Thread 5 tempo 92.250000s, filhos: 792.
+Thread 25 tempo 92.312500s, filhos: 801.
+Thread 3 tempo 92.312500s, filhos: 767.
+Thread 31 tempo 92.312500s, filhos: 753.
+Thread 15 tempo 92.375000s, filhos: 790.
+Thread 1 tempo 92.437500s, filhos: 707.
+Thread 12 tempo 92.437500s, filhos: 839.
+Thread 18 tempo 92.437500s, filhos: 753.
+Thread 4 tempo 92.500000s, filhos: 702.
+Thread 10 tempo 92.562500s, filhos: 742.
+Thread 19 tempo 92.562500s, filhos: 839.
+Thread 30 tempo 92.687500s, filhos: 801.
+Thread 7 tempo 92.750000s, filhos: 744.
+Thread 14 tempo 92.812500s, filhos: 772.
+Thread 23 tempo 92.812500s, filhos: 876.
+Thread 17 tempo 92.812500s, filhos: 824.
+Thread 20 tempo 92.812500s, filhos: 999.
+Thread 32 tempo 92.875000s, filhos: 778.
+Thread 9 tempo 92.875000s, filhos: 978.
+O tempo de execução do algorítmo foi: 92.875000s.
+Thread vencedor: 10
+
+64 = 15266
+
+Thread 12 tempo 15.625000s, filhos: 226.
+Thread 56 tempo 15.625000s, filhos: 181.
+Thread 10 tempo 15.625000s, filhos: 257.
+Thread 26 tempo 15.687500s, filhos: 238.
+Thread 33 tempo 15.625000s, filhos: 223.
+Thread 15 tempo 15.687500s, filhos: 202.
+Thread 13 tempo 15.687500s, filhos: 334.
+Thread 16 tempo 15.687500s, filhos: 220.
+Thread 53 tempo 15.687500s, filhos: 248.
+Thread 55 tempo 15.687500s, filhos: 188.
+Thread 5 tempo 15.687500s, filhos: 204.
+Thread 59 tempo 15.750000s, filhos: 191.
+Thread 24 tempo 15.750000s, filhos: 275.
+Thread 47 tempo 15.750000s, filhos: 226.
+Thread 1 tempo 15.812500s, filhos: 224.
+Thread 17 tempo 15.937500s, filhos: 238.
+Thread 30 tempo 15.937500s, filhos: 242.
+Thread 34 tempo 15.937500s, filhos: 254.
+Thread 7 tempo 15.937500s, filhos: 224.
+Thread 27 tempo 15.937500s, filhos: 258.
+Thread 44 tempo 15.937500s, filhos: 220.
+Thread 54 tempo 16.062500s, filhos: 239.
+Thread 36 tempo 16.062500s, filhos: 238.
+Thread 25 tempo 16.125000s, filhos: 236.
+Thread 43 tempo 16.125000s, filhos: 240.
+Thread 60 tempo 16.125000s, filhos: 210.
+Thread 39 tempo 16.187500s, filhos: 246.
+Thread 3 tempo 16.187500s, filhos: 233.
+Thread 48 tempo 16.250000s, filhos: 245.
+Thread 23 tempo 16.250000s, filhos: 245.
+Thread 38 tempo 16.250000s, filhos: 257.
+Thread 20 tempo 16.250000s, filhos: 276.
+Thread 58 tempo 16.250000s, filhos: 185.
+Thread 57 tempo 16.250000s, filhos: 215.
+Thread 46 tempo 16.250000s, filhos: 245.
+Thread 49 tempo 16.250000s, filhos: 249.
+Thread 32 tempo 16.250000s, filhos: 286.
+Thread 22 tempo 16.250000s, filhos: 231.
+Thread 19 tempo 16.250000s, filhos: 242.
+Thread 64 tempo 16.250000s, filhos: 213.
+Thread 42 tempo 16.250000s, filhos: 241.
+Thread 31 tempo 16.250000s, filhos: 251.
+Thread 4 tempo 16.312500s, filhos: 226.
+Thread 63 tempo 16.312500s, filhos: 220.
+Thread 8 tempo 16.312500s, filhos: 256.
+Thread 14 tempo 16.312500s, filhos: 251.
+Thread 61 tempo 16.312500s, filhos: 218.
+Thread 18 tempo 16.312500s, filhos: 233.
+Thread 29 tempo 16.312500s, filhos: 233.
+Thread 62 tempo 16.312500s, filhos: 237.
+Thread 37 tempo 16.312500s, filhos: 232.
+Thread 52 tempo 16.375000s, filhos: 247.
+Thread 28 tempo 16.375000s, filhos: 238.
+Thread 45 tempo 16.375000s, filhos: 263.
+Thread 40 tempo 16.375000s, filhos: 238.
+Thread 41 tempo 16.375000s, filhos: 256.
+Thread 2 tempo 16.375000s, filhos: 221.
+Thread 11 tempo 16.375000s, filhos: 260.
+Thread 21 tempo 16.375000s, filhos: 234.
+Thread 6 tempo 16.375000s, filhos: 243.
+Thread 35 tempo 16.375000s, filhos: 239.
+Thread 50 tempo 16.375000s, filhos: 249.
+Thread 51 tempo 16.375000s, filhos: 324.
+Thread 9 tempo 16.375000s, filhos: 252.
+O tempo de execução do algorítmo foi: 16.375000s.
+Thread vencedor: 58
+
+

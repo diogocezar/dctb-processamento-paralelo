@@ -1,0 +1,110 @@
+Execução SIMT (warps)
+=====================
+
+  - SIMT: Single Instruction Multi-Thread
+  - Warp: conjunto de 32 threads que executam a mesma instrução
+  - Warps são escalonados em seus respectivos Multiprocessadores sem overhead de
+de escalonamento
+
+(slide 43, Performance Optimizations)
+
+  - Quando threads de um mesmo warp divergem, todas as ramificações são
+executadas serialmente (e.g.: operações condicionais)
+  - Warps com threads homogêneas possuem melhor desempenho
+
+  - Threads executam código do kernel. O contexto de cada thread é armazenado em
+seus respectivos registradores.
+  - Warp é um conjunto de 32 threads executadas juntas em SIMT em um
+Multiprocessador. Execuções Divergentes são executadas serialmente.
+  - Half-warps é o conjunto de 16 threads de um warp. Coordenam acessos à
+memória em grupos de 16 elementos.
+  - Bloco são um ou mais warps executando no mesmo Multiprocessador. Diferentes
+warps podem tomar diferentes caminhos. Podem sincronizar todos os warps em um
+bloco. Utilizam a mesma memória compartilhada.
+
+Acessos Coalescentes à Memória Global
+=====================================
+  - Armazena os dados que serão processados pelas threads
+  - "Comunicação/Cooperação Inter-Grid"
+  - O acesso coalescentes são eficientes
+
+  - Coalescência: Acessos à memória global são coalescentes quando um half-warp
+acessa uma região de memória contígua.
+    + 16 elementos são acessados em uma única instrução:
+
+      -> int, float: 64 bytes (mais eficiente)
+      -> int2, float2: 128 bytes
+      -> int4, float4: 256 bytes (2 transações)
+
+  - Acessos não-coalescentes caracterizam 16 acessos serializados
+
+Memória Compartilhada
+=====================
+  - "Essencialmente uma cache gerenciada pelo usuário"
+  - Possui latência comparável a dos registradores
+  - Cooperação eficiente entre threads de um mesmo bloco
+
+  - Muitas threads acessam a memória compartilhada
+    + A memória compartilhada é dividida em (16) bancos
+    + Cada banco pode servir um acesso por ciclo
+    + Multiplos acessos simultâneos resultam em conflitos de bancos
+
+  - Solução?
+    + Garantir que todas as threads de um half-warp acessem diferentes bancos
+  
+  - No caso de conflitos de bancos:
+    + Custo = número máximo de acessos a um mesmo banco
+
+Sincronização de Threads ou Sincronização em nível de warp
+==========================================================
+
+  - Uma vez que os warps são livres para executar, eles podem precisar ser
+sincronizados.
+  - Instrução: __syncthreads();
+
+Memória de Textura
+==================
+  - Alternativa para o acesso eficiente à memória global
+    + Útil para o caso onde realizar o acesso de forma coalescente é difícil
+  - Utiliza uma cache (8KB por MP) para Otimizar o acesso
+    + Atinge melhor desempenho quando todas as threads de um warp acessam
+posições próximas (localidade espacial)
+  - Modo de uso:
+
+    + Declarando Textura:
+      texture<float,1,cudareadModeElementType> fTex;
+
+    + Vinculando Textura:
+      cudaBindTexture(offset, fTex, f);
+
+    + Acessando os dados:
+      f[i] = tex1Dfetch(fTex, i);
+
+Memória de Constante
+====================
+  - Cache da Memória Global (8KB)
+  -  Otimizada para o caso onde todas as threads de um warp leem de um mesmo
+endereço.
+    + Todo o warp acessa o mesmo endereço em uma operação
+    + Realiza uma operação para cada endereço lido
+    + O custo da operação é comparável a da memória de textura
+  - Modo de uso:
+    
+    + Declarando variável no escopo global:
+      __constant__ double stencil[5] = {4,3,2,1,0};
+    + O conteúdo pode ser definido em tempo de execução pela CPU:
+      cudaMemcpyToSymbol(symbol,src,size,offset,kind);
+    + Acessada diretamente através da variável global:
+      s = stencil[tid];
+
+Operações Atômicas
+==================
+  - Funcionam apenas com operadores inteiros.
+
+(ver lista de operações no Guia de Programação, pág 121, seção B.10.1)
+
+
+Fontes: Getting Started with CUDA
+        NVIDIA CUDA Programming Guide
+        CUDA, Supercomputing for the masses
+        Performance Optimization (http://developer.nvidia.com/object/nvision08-advanced-cuda.html)

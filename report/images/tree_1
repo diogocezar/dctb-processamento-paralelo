@@ -1,0 +1,9 @@
+digraph test123 {
+node [shape = record,height=.1];
+"prova" -> "p or r"
+"prova" -> "not s or q"
+"p or r" -> "not p or s"
+"p or r" -> "not r"
+"not s or q" -> "not p or s"
+"not s or q" -> "not q"
+}

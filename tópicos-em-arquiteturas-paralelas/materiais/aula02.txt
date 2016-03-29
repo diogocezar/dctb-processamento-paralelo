@@ -1,0 +1,143 @@
+Aula 02 - Multiprocessadores e Paralelismo a Nível de thread
+------------------------------------------------------------
+
+* Por que computadores paralelos vieram para ficar?
+  - Limitação no tamanho dos componentes -> latência, alimentação e dissipação
+    + Maior problema é dissipação.
+    
+  - Limitação do paralelismo de instrução (ILP)
+    + ILP: divisão em sub-unidades funcionais independentes
+    + Maior trabalho feito pelos compiladores: reordenamento de instruções
+    + Referência: descrição e problemas -> Patterson.
+
+  - Desde 1980 computadores paralelos de memória compartilhada
+    + Multithreading (Intel Hyperthread) permite execução intercalada de
+      diversas threads, mantendo o pipeline de instruções cheio.
+    + Multicore implementa processadores completos
+  
+  - Compiladores terão de aprender a lidar com essa realidade, mas o programador
+    terá que descrever os pontos de concorrência da sua aplicação.
+    
+  - Em 2005 Intel parou de desenvolver ILP para dedicar-se ao multicore, 
+    seguindo IBM e Sun
+    
+  - Fatores que impulsionam multiprocessamento:
+    + Interesse crescente em performance de servidores (mainframe!?)
+    + Programas que usam quantidades massivas de dados
+    + Compreensão de como usar multiprocessamento com efetividade, especialmente
+      em servidores, que possuem paralelismo de threads intrínseco
+    + Redução de custo de design: replicação de um core mais simples
+    
+* Taxonomia de Arquiteturas Paralelas de Memória Compartilhada
+  - Single Instruction stream Single Data stream (SISD): uniprocessador
+  
+  - Single Instruction stream Multiple Data streams (SIMD)
+    + Mesma instrução executada por multiplos processadores usando dados
+      diferentes.
+    + Exploram paralelismo de dados
+    + Cada processador tem seus próprios dados, mas há apenas uma memória de
+      instruções.
+    + Operações sobre multimídia (CUDA, SSE)
+    
+  - Multiple Instruction streams Multiple Data streams (MIMD)
+    + Cada processador tem seus próprios dados e instruções
+    + Explora o paralelismo em nível de Thread, uma vez que elas operam
+      simultaneamente.
+    + Mais flexível do que SIMD e por isso mais genéricamente aplicável
+    + Foco do início da disciplina (OpenMP)
+    
+* Processadores MIMD
+  - São flexíveis: podem ser otimizados como multiprocessadores single-user
+    para alta performance, multiprogramados, com diversas threads, ou uma
+    combinação.
+  - Vantajosos do ponto de vista de custo pois podem ser construídos a partir
+    da combinação de processadores existentes.
+    
+  - Cada processador executa seu próprio conjunto de instruções. Eventualmente
+    processos distintos ou threads distintas.
+      + Diferenciar processos de threads
+      + Conceito de thread para o processador pode significar qquer um dos dois
+      
+  - O programador precisa aprender a aproveitar o paralelismo a nível de threads
+      + quantas, quando iniciar, quando sincronizar
+      + também pode ser utilizado para explorar paralelismo a nível de dados,
+        entretanto há um overhead que pode tornar proibitivo (comparado a SIMD)
+      
+* Divisão dos MIMD quanto ao tipo de memória
+  - Arquiteturas de memória compartilhada centralizada
+    + Symmetric (shared-memory) multiprocessors (SMPs)
+      + Uniform Memory Access (UMA): acesso à mesma latência
+    + Para atender à demanda de memória com poucos cores: cache grande, 
+      uma memória em múltiplos bancos.
+    + Aumentando o número de cores (algumas dezenas): aumentar número de bancos
+      de memória, usar conexões p2p ou switch.
+    + É a arquitetura mais utilizada.
+    
+    FIGURA pg.200 Patterson
+ 
+  - Arquiteturas de memória distribuída
+    + Permite maior número de processadores. No modelo centralizado o barramento
+      da memória não suportaria a demanda. Alta latência.
+    + Quanto maior a velocidade dos processadores, menor o número que pode
+      compartilhar barramento.
+    + Necessita de uma interconexão de alta velocidade, tipicamente switches ou
+      redes mesh multidimensionais.
+    
+    FIGURA pg.201 Patterson
+    
+    + Vantagens: baixo custo para alta banda de acesso, uma vez que a maioria
+      dos acessos ocorre na mem. local. Redução da latência.
+    + Desvantagem: comunicação entre processos mais complexa e aproveitamento
+      da maior banda de memória exige esforço do software **PROGRAMADOR**.    
+      
+* Modelos de Comunicação e Arquitetura de Memória
+  Como compartilhar dados em sistemas de memória distribuída.
+  
+  - Compartilhamento do espaço de endereçamento (Distributed Shared-Memory DSM)
+    + todos processadores tem acesso ao mesmo espaço de endereçamento, embora
+      os espaços estejam fisicamente em locais diferentes.
+    + Shared-Memory refere-se ao espaço de endereçamento, não a uma única memória
+    + Non-Uniform Memory Access (NUMA): tempo de acesso depende da distância
+      entre banco de memória e processador
+    + compartilhamento de dados é transparente/implícito através de operações
+      de load/store
+      
+  - Espaços de endereçamento distintos
+    + cada processador tem seu espaço em sua memória
+    + comunicação deve ser feita explicitamente através de mecanismo
+    + Ex. clusters
+  
+* Memória Cache em Processadores SMP
+  - não é compartilhada.
+  
+  FIGURA pg.5 Chapman
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  - Problema da "inconsistência de memória"
+  - Necessidade de mecanismo de "coerência de cache"
+    + fora do controle do programador, mas este deve saber fazer bom uso
+    + ex.: snooping: cada proc. tem o bloco e monitora o barramento
+           directory: status de cada bloco é mantido centralizado
+        + infos em Patterson.
+  - Sistemas que implementam coerência de forma transparente são chamados
+    de "cache coherent"
+  - OpenMP abstrai implementações físicas pois tem seu próprio modelo de 
+    memória, com dados privados e compartilhados (private, shared), e especifica
+    quando há garantia de que um dado compartilhado está disponível.
+    
+* Programando SMPs
+  - Compiladores são projetados para fazer o melhor uso do ILP, mas não funciona
+    para multicore, pois é difícil definir trechos de código/dados independentes
+    e o compilador também não pode mudar o algoritmo para deixálo paralelizável.
+

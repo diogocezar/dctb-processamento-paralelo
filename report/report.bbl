@@ -1,0 +1,52 @@
+\begin{thebibliography}{1}
+
+\bibitem{1608962}
+C.~Breshears.
+\newblock {\em The Art of Concurrency: A Thread Monkey's Guide to Writing
+  Parallel Applications}.
+\newblock O'Reilly Media, Inc., 2009.
+
+\bibitem{1370966}
+B.~Chapman, G.~Jost, and R.~v.~d. Pas.
+\newblock {\em Using OpenMP: Portable Shared Memory Parallel Programming
+  (Scientific and Engineering Computation)}.
+\newblock The MIT Press, 2007.
+
+\bibitem{Enderton}
+H.~B. Enderton.
+\newblock {\em A Mathematical Introduction to Logic}.
+\newblock Academic Press, ny, 1972.
+
+\bibitem{ginsberg:1993}
+M.~Ginsberg.
+\newblock {\em Essentials of Artificial Intelligence}.
+\newblock Morgan Kaufmann, 1993.
+
+\bibitem{1266729}
+E.~Humenay, D.~Tarjan, and K.~Skadron.
+\newblock Impact of process variations on multicore performance symmetry.
+\newblock In {\em DATE '07: Proceedings of the conference on Design, automation
+  and test in Europe}, San Jose, CA, USA, 2007. EDA Consortium.
+
+\bibitem{520759}
+B.~Parhami.
+\newblock {\em Introduction to Parallel Processing: Algorithms and
+  Architectures}.
+\newblock Kluwer Academic Publishers, Norwell, MA, USA, 1999.
+
+\bibitem{1211440}
+M.~J. Quinn.
+\newblock {\em Parallel Programming in C with MPI and OpenMP}.
+\newblock McGraw-Hill Education Group, 2003.
+
+\bibitem{resolu}
+E.~Rich and K.~Knight.
+\newblock {\em Inteligência Artificial}.
+\newblock Makron Books, 2 edition, 1995.
+
+\bibitem{resolu2}
+R.~S and N.~P.
+\newblock {\em Artificial Intelligence. A Modern Approach}.
+\newblock Prentice Hall, 1995.
+
+\end{thebibliography}

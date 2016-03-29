@@ -1,0 +1,11 @@
+\select@language {brazil}
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Estrutura em \'arvore de cl\'ausulas candidatas}}{18}
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Gr\'afico das menores cl\'ausulas geradas para abordagem de colabora\c c\~ao entre cl\'ausulas}}{27}
+\contentsline {figure}{\numberline {4.2}{\ignorespaces Gr\'afico de tempo de execu\c c\~ao para abordagem de colabora\c c\~ao entre cl\'ausulas}}{28}
+\contentsline {figure}{\numberline {4.3}{\ignorespaces Gr\'afico das menores cl\'ausulas geradas para abordagem de divis\~ao por \emph {threads}}}{28}
+\contentsline {figure}{\numberline {4.4}{\ignorespaces Gr\'afico de tempo de execu\c c\~ao para abordagem de divis\~ao por \emph {threads}}}{29}
+\addvspace {10\p@ }

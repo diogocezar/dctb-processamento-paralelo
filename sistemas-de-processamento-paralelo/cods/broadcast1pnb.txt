@@ -1,0 +1,7 @@
+proc_i write into M[i];
+s := 1;
+while s<p, proc_j, 0 <= j < min(s,(p-s)) do
+	copy M[j] into M[j+s];
+	S := 2*s;
+endwhile
+proc_j, 0 <= j < p, read M[j];

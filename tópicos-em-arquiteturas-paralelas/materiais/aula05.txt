@@ -1,0 +1,198 @@
+Aula 05
+-------
+
+* Principais Diretivas de OpenMP
+  - Construção 'parallel'
+  - Construções de divisão de trabalho
+    + loop
+    + section
+    + single
+  - Cláusulas de compartilhamento de dados, 'no wait' e escalonamento
+  
+* Construção Parallel
+  ------------------------------------------
+  #pragma omp parallel [clause, clause, ...]
+    bloco estruturado
+  ------------------------------------------
+  - A partir desta construção é criado o time de threads
+  - Inicia a execução paralela, mas não distribui o trabalho da região
+    entre as threads. Cabe ao programador definir a divisão de trabalho.
+  - A thread que encontra uma região 'parallel' vira master do novo time
+  - O ID dos threads varia de 0 (master) a n-1
+  
+      #pragma omp parallel
+       {
+         printf("The parallel region is executed by thread %d\n",
+            omp_get_thread_num());
+         if ( omp_get_thread_num() == 2 ) {
+            printf(" Thread %d does things differently\n",
+                   omp_get_thread_num());
+         }
+       } /*-- End of parallel region --*/
+
+  - Cláusulas suportadas
+    +----------------------------------
+    + if(scalar-expression)
+    + num threads(integer-expression)
+    + private(list)
+    + firstprivate(list)
+    + shared(list)
+    + default(none|shared)
+    + copyin(list)
+    + reduction(operator:list)
+    +----------------------------------
+  - Restrições:
+    + Não pode haver saltos para dentro ou para fora de uma região paralela
+    + O programa não pode depender da ordem das cláusulas
+    + Apenas uma cláusula 'if'
+    + Apenas uma cláusula 'num_threads'
+    
+* Construções de Divisão de Trabalho
+  - dividem a computação entre as threads
+  - devem estar em uma região paralela ativa, senão são ignoradas (ex. Função)
+  - Regras:
+    + Cada construção deve ser atingida por TODAS as threads ou por NENHUMA
+    + A sequência de regiões de divisão de trabalho e barreiras deve ser
+      a mesma para todas as threads de um time.
+  - Não constrói threads e não tem barreira de entrada. Por default barreira
+    na saída.
+    
+  * Construção Loop
+    -----------------------------------------
+    #pragma omp for [clause, clause, ...]
+        laço for
+    -----------------------------------------
+    - limitado a laços com número de execuções conhecido, construção com apenas
+      uma variável de controle:
+        ---------------------------------------
+        for (init-expr; var relop b; incr-expr
+        ---------------------------------------
+    - Cláusulas suportadas
+      +----------------------------------
+      + private(list)
+      + firstprivate(list)
+      + lastprivate(list)
+      + ordered
+      + schedule(kind[,chunk_size])
+      + reduction(operator:list)
+      + nowait
+      +----------------------------------
+    - Dois laços consecutivos: todos esperam na barreira (excessão:nowait)
+     
+  * Construção Sections
+    -------------------------------------------------
+    #pragma omp sections [clause, clause, ...]
+    {
+      [#pragma omp section ]
+         structured block
+      [#pragma omp section
+         structured block ]
+      ...
+    }
+    -------------------------------------------------  
+    - Cada thread executa um trecho diferente de código
+    - Cada seção deve ter um bloco de código independete das outras
+    - Cada bloco é executado apenas uma vez, e cada thread executa apenas
+      um bloco por vez
+    - Não há ordem de execução
+    - Problemas: 
+      + mais threads que blocos
+      + balancemento de carga
+      
+        #pragma omp parallel
+        {
+           #pragma omp sections
+           {
+              #pragma omp section
+                (void) funcA();
+              #pragma omp section
+                (void) funcB();
+           } /*-- End of sections block --*/
+        } /*-- End of parallel region --*/
+
+  * Construção Single
+  -----------------------------------------
+  #pragma omp single [clause, ...]
+     structured block
+  -----------------------------------------
+  
+       #pragma omp parallel shared(a,b) private(i)
+        {
+           #pragma omp single
+           {
+              a = 10;
+              printf("Single construct executed by thread %d\n",
+                      omp_get_thread_num());
+           }
+           /* A barrier is automatically inserted here */
+           #pragma omp for
+           for (i=0; i<n; i++)
+               b[i] = a;
+        } /*-- End of parallel region --*/
+           printf("After the parallel region:\n");
+           for (i=0; i<n; i++)
+               printf("b[%d] = %d\n",i,b[i]);
+
+    - Possui barreira automática
+    - Por que não deixar todas as threads escreverem o valor da variável?
+      + escrita não é atômica: resultado imprevisível
+      + problema de performance
+
+  * Possível combinar 'parallel' com 'for' ou 'section'
+  
+* Cláusulas de controle das construções de Divisão de Trabalho
+  - São processadas ANTES de entrar na região paralela. São externas
+  
+  * shared
+    - Cuidar com uso simultâneo
+    - Cuidar com tamanho do cache!
+  
+  * private
+    - valor indefinido na entrada e depois da saída da região paralela
+    
+  * lastprivate
+    - última thread na sequencia atualiza variável fora do bloco:
+      + no caso de laço: último pedaço (thread depende do schedule)
+      + no caso de section: última a aparecer no código
+    
+          #pragma omp parallel for private(i) lastprivate(a)
+          for (i=0; i<n; i++)
+           {
+               a = i+1;
+               printf("Thread %d has a value of a = %d for i = %d\n",
+                      omp_get_thread_num(),a,i);
+           } /*-- End of parallel for --*/
+          printf("Value of a after parallel for: a = %d\n",a);
+
+    - Poderia ser substituído por um if e uma variável shared
+    - Há aumento de custo em qquer caso para determinar qual thread deve
+      efetuar a cópia. (schedule)
+      
+   * firstprivate
+     - inicializa o valor de todos elementos da thread
+     - geralmente, variáveis read-only podem ser shared
+       + no caso de cc-NUMA, melhor firstprivate!
+       
+     - EXERCÍCIO: cada thread em uma região paralela precisa acessar uma
+       seção específica de um vetor, mas o acesso inicia a partir de um
+       offset (!= 0)
+       
+       Seja 'a' o vetor, 'indx' o offset, 'n' o tamanho do chunk
+       
+       
+       #pragma omp parallel default(none) private(i,TID,indx) \
+                shared(n,offset,a)
+       {
+          TID = omp_get_thread_num();
+          indx = offset + n*TID;
+          for(i=indx; i<indx+n; i++)
+             a[i] = TID + 1;
+       } /*-- End of parallel region --*/
+
+
+    * default
+    
+    * nowait
+      - retira a barreira ao final de uma região de divisão de trabalho
+      - barreiras ao fim de regiões paralelas não podem ser removidas
+      - CUIDADO: race conditions!

@@ -1,0 +1,10 @@
+#pragma omp parallel
+{
+    #pragma omp sections
+    {
+        #pragma omp section
+            (void) funcA();
+        #pragma omp section
+            (void) funcB();
+    }
+}

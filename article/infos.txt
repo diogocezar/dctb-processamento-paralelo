@@ -1,0 +1,37 @@
+diogoc@bowmore:~/Desktop/imf-threads$ ./imf ./formules/aim-50-1_6-no-3.cnf 4
+Thread 1 tempo 36.125000s, filhos: 1180.
+Thread 2 tempo 36.125000s, filhos: 1837.
+Thread 3 tempo 36.250000s, filhos: 1407.
+Thread 4 tempo 36.437500s, filhos: 1376.
+O tempo de execução do algorítmo foi: 36.437500s.
+Thread vencedor: 3
+diogoc@bowmore:~/Desktop/imf-threads$ ./imf ./formules/aim-50-1_6-no-3.cnf 8
+Thread 4 tempo 73.250000s, filhos: 1736.
+Thread 7 tempo 73.250000s, filhos: 1245.
+Thread 5 tempo 73.250000s, filhos: 1274.
+Thread 6 tempo 73.312500s, filhos: 1493.
+Thread 3 tempo 74.062500s, filhos: 1407.
+Thread 2 tempo 74.187500s, filhos: 1563.
+Thread 8 tempo 74.187500s, filhos: 1653.
+Thread 1 tempo 74.187500s, filhos: 1223.
+O tempo de execução do algorítmo foi: 74.187500s.
+Thread vencedor: 3
+diogoc@bowmore:~/Desktop/imf-threads$ ./imf ./formules/aim-50-1_6-no-3.cnf 16
+Thread 11 tempo 70.875000s, filhos: 832.
+Thread 16 tempo 71.000000s, filhos: 724.
+Thread 6 tempo 71.250000s, filhos: 939.
+Thread 15 tempo 71.312500s, filhos: 790.
+Thread 4 tempo 71.375000s, filhos: 702.
+Thread 1 tempo 71.500000s, filhos: 707.
+Thread 12 tempo 71.562500s, filhos: 839.
+Thread 5 tempo 71.562500s, filhos: 792.
+Thread 3 tempo 71.562500s, filhos: 767.
+Thread 13 tempo 71.625000s, filhos: 786.
+Thread 10 tempo 71.687500s, filhos: 742.
+Thread 7 tempo 71.750000s, filhos: 1037.
+Thread 8 tempo 71.750000s, filhos: 801.
+Thread 2 tempo 71.750000s, filhos: 860.
+Thread 14 tempo 71.750000s, filhos: 772.
+Thread 9 tempo 71.750000s, filhos: 978.
+O tempo de execução do algorítmo foi: 71.750000s.
+Thread vencedor: 10

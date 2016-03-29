@@ -1,0 +1,101 @@
+Gerenciamento de Memória (Getting Started, pág 23)
+========================
+
+cudaMalloc(void** pointer, size_t nbytes)
+ - Aloca um ponteiro em GPU
+ - pointer deve ser alocado previamente em CPU
+
+cudaMemset(void* pointer, int value, size_t nbytes)
+ - Preenche os primeitos nbytes do endereço de memória com o value
+ 
+cudaFree(void* pointer)
+ - Libera o ponteiro em GPU
+
+cudaMemcpy(void* dst, void* src, size_t nbytes, enum cudaMemcpyKind direction)
+ - copia os nbytes de src para dst
+ - direction indica a direção da transferência:
+   + cudaMemcpyHostToDevice
+   + cudaMemcpyDeviceToHost
+   + cudaMemcpyDeviceToDevice
+
+Exemplo de gerenciamento de memória (Getting Started, pág 25)
+
+Executando Código em GPU
+========================
+
+Kernels são funções em C com restrições
+ - Não podem acessar memória do Host
+ - Deve retornar void
+ - O número de argumentos não pode ser variável (é fixo)
+ - Não possui recursão
+ - Não possui variáveis estáticas
+
+Os argumentos são automaticamente transferidos para a memória da GPU
+
+As funções podem ser qualificadas em:
+ - __global__ : chamada pelo Host e executada pelo Device
+ - __device__ : chamada pelo Device e executada pelo Device
+ - __host__ : chamada pelo Host e executada pelo Host
+   + Pode ser combinada com o qualificador __device__ para gerar uma função que
+pode executar tanto em CPU e quanto em GPU
+
+Lançando Kernels: kernel<<<dG, dB>>>(...)
+ - dim3 dG: dimensões do Grid
+ - dim3 dB: dimensões do Bloco
+
+Variáveis Pré-definidas:
+ - dim3 gridDim
+ - dim3 blockDim
+ - dim3 blockIdx
+ - dim3 threadIdx
+
+Identificadores de Threads: Imagem (Getting Started, pág 40)
+
+Exemplo de Código: Imagem (Getting Started, pág 42)
+
+Tipos vetoriais pré-definidos:
+ - [u]char[1..4]
+ - [u]short[1..4]
+ - [u]int[1..4]
+ - [u]long[1..4]
+ - float[1..4]
+ - double[1..2]
+ - dim3
+
+Qualificadores de Variáveis:
+ - __device__ : indica que a variável em questão será alocada na memória global.
+   + variáveis alocadas com cudaMalloc() possuem este qualificador
+implicitamente.
+ - __shared__ : indica que a variável em questão será alocada na memória
+compartilhada.
+   + é acessível por todas as threads no mesmo bloco onde ela foi criada.
+ - Variáveis não qualificadas:
+   + Escalares e tipos vetoriais pré-definidos são alocados nos registradores.
+   + O que não couber nos registradores é alocado na memória local.
+
+Memória Compartilhada (Getting Started, pág 46)
+
+Sincronização pelo Host
+=======================
+
+ - Todos os Kernels são assíncronos
+   + O controle volta imediatamente para a CPU assim que um kernel é lançado
+ - cudaMemcpy é síncrono
+   + O controle volta para a CPU após a cópia terminar
+ - cudaThreadSynchonize()
+   + bloqueia (espera) até que todas as chamadas CUDA terminem
+
+Exemplo (Getting Started, pág 44)
+
+Exercícios:
+ 1. Soma de Vetores
+ ==================
+ Somar dos vetores da seguinte forma: C[i] <- A[i] + B[i].
+
+ 2. Tumor Therapy usando CUDA
+ ============================
+ Reimplementar o algoritmo do Exercício Tumor Therapy usando CUDA.
+
+Fontes:
+ - NVIDIA CUDA Library: http://developer.download.nvidia.com/compute/cuda/3_0/toolkit/docs/online/index.html
+ - Getting Started witk CUDA; NVISION08

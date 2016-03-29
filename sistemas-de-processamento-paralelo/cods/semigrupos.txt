@@ -1,0 +1,7 @@
+proc_j, 0 <= j < p, copy X[j] into M[j];
+s := 1;
+while  s < p, proc_j, 0 <= s < p-s do
+	M[j+s] := M[j] <operador> M[j+s]
+	s := s*2;
+endwhile
+broadcast M[p-1] to all proc
